@@ -87,6 +87,11 @@ Window {
       }
     }
 
+    TasksModel {
+      id: tasksModel
+      Component.onCompleted: tasksModel.load_tasks()
+    }
+
     Rectangle {
       id: content
       color: contentBackground
@@ -96,35 +101,54 @@ Window {
       Column {
         anchors.fill: parent
         anchors.margins: 30
-        spacing: 0
+        spacing: 5
 
-        CheckBox {
-          text: "This is the first task"
-          checked: false
-          // anchors.left: parent.left
-          // anchors.right: parent.right
+        Repeater {
+          model: tasksModel.tasks
 
-          style: CheckBoxStyle {
-            spacing: 20
+          Rectangle {
+            color: primaryColor
+            width: parent.width
+            height: childrenRect.height + 20
 
-            indicator: Rectangle {
-              implicitWidth: 35
-              implicitHeight: 35
-              color: primaryColor
-
-              Rectangle {
-                visible: control.checked
-                color: accentColor
-                anchors.margins: 1
-                anchors.fill: parent
-              }
+            MouseArea {
+              enabled: true
+              onClicked: tasksModel.set_checked(model.index, !model.checked)
+              anchors.fill: parent
             }
 
-            label: Text {
-              text: control.text
-              color: textColor
-              font.pointSize: 20
-              font.family: contentFont.name
+            Row {
+              width: parent.width
+              height: childrenRect.height
+              x: 10
+              y: 10
+              spacing: 16
+
+              Rectangle {
+                width: 35
+                height: 35
+                color: primaryColor
+                border.width: 2
+                border.color: contentBackground
+
+                Rectangle {
+                  visible: model.checked
+                  color: accentColor
+                  anchors.margins: 1
+                  anchors.fill: parent
+                }
+              }
+
+              Text {
+                text: model.text
+                color: textColor
+                font.pointSize: 20
+                font.family: contentFont.name
+                y: 5
+                wrapMode: Text.WordWrap
+                width: parent.width
+                verticalAlignment: Text.AlignVCenter
+              }
             }
           }
         }
