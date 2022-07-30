@@ -87,6 +87,8 @@ Window {
       }
     }
 
+    Text { text: "foobar" }
+
     TasksModel {
       id: tasksModel
       Component.onCompleted: tasksModel.load_tasks()
@@ -98,18 +100,21 @@ Window {
       width: parent.width
       height: parent.height - clock.height
 
-      Column {
+      ListView {
         anchors.fill: parent
+        model: tasksModel.tasks
         anchors.margins: 30
         spacing: 5
+        clip: true
 
-        Repeater {
-          model: tasksModel.tasks
+        delegate: Item {
+          width: ListView.view.width
+          height: childrenRect.height
 
           Rectangle {
             color: primaryColor
             width: parent.width
-            height: childrenRect.height + 20
+            height: blockRow.height + 20
 
             MouseArea {
               enabled: true
@@ -118,6 +123,7 @@ Window {
             }
 
             Row {
+              id: blockRow
               width: parent.width
               height: childrenRect.height
               x: 10
