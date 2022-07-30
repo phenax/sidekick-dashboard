@@ -7,5 +7,6 @@ qrc!(pub load_resources,
     "assets/Oxanium-Regular.ttf",
     "src/widgets/Clock.qml",
     "src/widgets/TaskList.qml",
+    "src/widgets/Checkbox.qml",
   },
 );
