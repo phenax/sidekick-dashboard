@@ -4,6 +4,8 @@ import QtQuick.Controls 1.4;
 import QtQuick.Controls.Styles 1.4;
 import QtQuick.Layouts 1.15;
 
+import Sidekick 1.0;
+
 Window {
   id: window
   title: "Sidekick Dashboard"
@@ -28,6 +30,20 @@ Window {
     source: "../assets/Oxanium-Regular.ttf"
   }
 
+  ClockModel {
+    id: clockModel
+    time_format: "%I:%M:%S"
+    date_format: "%A, %d %b"
+
+    Component.onCompleted: clockModel.update_time()
+  }
+  Timer {
+    interval: 500;
+    running: true;
+    repeat: true
+    onTriggered: clockModel.update_time()
+  }
+
   Column {
     anchors.fill: parent
     spacing: 0
@@ -43,7 +59,7 @@ Window {
         spacing: 0
 
         Text {
-          text: "03:27"
+          text: clockModel.time
           color: textColor
           width: parent.width
           height: parent.height * 0.73
@@ -55,7 +71,7 @@ Window {
         }
 
         Text {
-          text: "Friday, 30 July"
+          text: clockModel.date
           color: textColor
           width: parent.width
           horizontalAlignment: Text.AlignHCenter

@@ -2,7 +2,7 @@ use qmetaobject::prelude::*;
 #[cfg(not(no_qt))]
 use qmetaobject::webengine;
 
-// mod model;
+mod model;
 mod resources;
 
 pub fn create_application() -> QQuickView {
@@ -10,6 +10,7 @@ pub fn create_application() -> QQuickView {
   webengine::initialize();
 
   resources::load_resources();
+  model::register_all();
 
   let mut view = QQuickView::new();
 
