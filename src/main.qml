@@ -56,16 +56,21 @@ Window {
 
       Column {
         anchors.fill: parent
+        anchors.topMargin: 50
+        anchors.bottomMargin: anchors.topMargin
+        anchors.leftMargin: 50
+        anchors.rightMargin: anchors.leftMargin
         spacing: 0
 
         Text {
           text: clockModel.time
           color: textColor
           width: parent.width
-          height: parent.height * 0.73
-          horizontalAlignment: Text.AlignHCenter
+          height: parent.height * 0.75
+          fontSizeMode: Text.HorizontalFit
           verticalAlignment: Text.AlignBottom
-          font.pointSize: 125
+          horizontalAlignment: Text.AlignHCenter
+          font.pointSize: 120
           font.bold: true
           font.family: titleFont.name
         }
@@ -75,7 +80,6 @@ Window {
           color: textColor
           width: parent.width
           horizontalAlignment: Text.AlignHCenter
-          verticalAlignment: Text.AlignTop
           font.pointSize: 22
           font.bold: true
           font.family: titleFont.name
@@ -95,7 +99,7 @@ Window {
         spacing: 0
 
         CheckBox {
-          text: "This is the first"
+          text: "This is the first task"
           checked: false
           // anchors.left: parent.left
           // anchors.right: parent.right
