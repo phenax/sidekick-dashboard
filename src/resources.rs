@@ -12,5 +12,6 @@ qrc!(pub load_resources,
     "src/widgets/Clock.qml",
     "src/widgets/TaskList.qml",
     "src/widgets/Checkbox.qml",
+    "src/widgets/IdleAnimations.qml",
   },
 );

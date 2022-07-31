@@ -55,8 +55,8 @@ Window {
         Item {
           id: tabState
 
-          property var tabs: ["Tasks", "-"]
-          property var activeTab: 0
+          property var tabs: ["Tasks", "-", "Debug"]
+          property var activeTab: 1
 
           function next() {
             tabState.activeTab = (tabState.activeTab + 1) % tabState.tabs.length
@@ -134,6 +134,10 @@ Window {
             Widget.TaskList {
               id: taskList
             }
+          }
+
+          Item {
+            Widget.IdleAnimations { }
           }
 
           Item {
