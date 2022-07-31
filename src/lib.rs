@@ -2,6 +2,7 @@ use qmetaobject::prelude::*;
 #[cfg(not(no_qt))]
 use qmetaobject::webengine;
 
+mod config;
 mod model;
 mod resources;
 

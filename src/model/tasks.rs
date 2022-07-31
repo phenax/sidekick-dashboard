@@ -1,3 +1,4 @@
+use crate::config::{Config, TaskData};
 use qmetaobject::{prelude::*, SimpleListItem, SimpleListModel};
 use std::cell::RefCell;
 use std::ops::Index;
@@ -11,6 +12,21 @@ struct Task {
 }
 
 impl Task {
+  fn from(data: TaskData) -> Self {
+    Self {
+      text: data.text.into(),
+      checked: data.checked,
+      ..Self::default()
+    }
+  }
+
+  fn to_data(&self) -> TaskData {
+    TaskData {
+      text: self.text.to_string(),
+      checked: self.checked,
+    }
+  }
+
   fn set_checked(&self, checked: bool) -> Self {
     Self {
       checked,
@@ -35,27 +51,12 @@ pub struct TasksModel {
 
 impl TasksModel {
   fn load_tasks(&mut self) {
-    self.tasks.borrow_mut().insert(
-      0,
-      Task {
-        text: "Helolo worldd".into(),
-        ..Task::default()
-      },
-    );
-    self.tasks.borrow_mut().insert(
-      0,
-      Task {
-        text: "Testing 1 2 4".into(),
-        ..Task::default()
-      },
-    );
-    self.tasks.borrow_mut().insert(
-      0,
-      Task {
-        text: "More tasks will go here foobasr".into(),
-        ..Task::default()
-      },
-    );
+    let d = Config::load_file();
+
+    self
+      .tasks
+      .borrow_mut()
+      .reset_data(d.today.iter().map(|t| Task::from((*t).clone())).collect());
 
     self.tasks_updated();
   }
@@ -64,6 +65,12 @@ impl TasksModel {
     let mut tasks = self.tasks.borrow_mut();
     let t = tasks.index(index).set_checked(checked);
     tasks.change_line(index, t);
-    self.tasks_updated()
+    self.tasks_updated();
+
+    // Save config
+    Config {
+      today: tasks.iter().map(|t| t.to_data()).collect(),
+    }
+    .save()
   }
 }

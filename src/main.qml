@@ -41,17 +41,13 @@ Window {
       Widget.Clock {}
     }
 
-    Text { text: "foobar" }
-
     Rectangle {
       id: content
       color: contentBackground
       width: parent.width
       height: parent.height - clock.height
 
-      Widget.TaskList {
-        
-      }
+      Widget.TaskList { }
     }
   }
 }
