@@ -43,24 +43,27 @@ Window {
     }
 
     Rectangle {
-      id: content
       color: contentBackground
       width: parent.width
       height: parent.height - clock.height
 
       Column {
-        id: tabState
+        id: content
         anchors.fill: parent
         anchors.topMargin: 10
 
-        property var tabs: ["Tasks", "-"]
-        property var activeTab: 0
+        Item {
+          id: tabState
 
-        function next() {
-          tabState.activeTab = (tabState.activeTab + 1) % tabState.tabs.length
-        }
-        function prev() {
-          tabState.activeTab = tabState.activeTab == 0 ? tabState.tabs.length - 1 : tabState.activeTab - 1
+          property var tabs: ["Tasks", "-"]
+          property var activeTab: 0
+
+          function next() {
+            tabState.activeTab = (tabState.activeTab + 1) % tabState.tabs.length
+          }
+          function prev() {
+            tabState.activeTab = tabState.activeTab == 0 ? tabState.tabs.length - 1 : tabState.activeTab - 1
+          }
         }
 
         Row {
@@ -68,18 +71,28 @@ Window {
           width: parent.width
           height: 30
 
-          Rectangle {
+          component ScaledButton: Rectangle {
+            id: arrowBtn
+            property var text
+            signal clicked
+
+            readonly property var activeColor: "#30000000"
+            readonly property var defaultColor: "transparent"
+
             width: parent.width * 2 / 5
             height: parent.height
-            color: "transparent"
+            color: defaultColor
 
             MouseArea {
+              hoverEnabled: true
               anchors.fill: parent
-              onClicked: tabState.next()
+              onClicked: arrowBtn.clicked()
+              onEntered: arrowBtn.color = activeColor
+              onExited: arrowBtn.color = defaultColor
             }
 
             Text {
-              text: "⇐"
+              text: arrowBtn.text
               anchors.fill: parent
               color: textColor
               font.family: titleFont.name
@@ -87,46 +100,35 @@ Window {
               horizontalAlignment: Text.AlignHCenter
               verticalAlignment: Text.AlignVCenter
             }
+          }
+
+          ScaledButton {
+            text: "⇐"
+            onClicked: tabState.next()
           }
 
           Text {
             text: tabState.tabs[tabState.activeTab]
             width: parent.width / 5
             height: parent.height
-            font.family: contentFont.name
             color: textColor
+            font.family: contentFont.name
             font.pointSize: 16
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
           }
 
-          Rectangle {
-            width: parent.width * 2 / 5
-            height: parent.height
-            color: "transparent"
-
-            MouseArea {
-              anchors.fill: parent
-              onClicked: tabState.prev()
-            }
-
-            Text {
-              text: "⇒"
-              anchors.fill: parent
-              color: textColor
-              font.family: titleFont.name
-              font.pointSize: 16
-              horizontalAlignment: Text.AlignHCenter
-              verticalAlignment: Text.AlignVCenter
-            }
+          ScaledButton {
+            text: "⇒"
+            onClicked: tabState.prev()
           }
         }
 
         StackLayout {
           id: tabStack
           currentIndex: tabState.activeTab
-          width: tabState.width
-          height: tabState.height
+          width: content.width
+          height: content.height
 
           Rectangle {
             color: contentBackground
