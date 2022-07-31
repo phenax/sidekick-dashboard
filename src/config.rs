@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct TaskData {
   pub text: String,
+  #[serde(skip_serializing_if = "std::ops::Not::not")]
+  #[serde(default)]
   pub checked: bool,
 }
 

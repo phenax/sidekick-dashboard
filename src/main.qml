@@ -130,12 +130,13 @@ Window {
           width: content.width
           height: content.height
 
-          Rectangle {
-            color: contentBackground
+          Item {
             Widget.TaskList { }
           }
 
-          Text { text: "foobar" }
+          Item {
+            Text { text: "foobar" }
+          }
         }
       }
     }
