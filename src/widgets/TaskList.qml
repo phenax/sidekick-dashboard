@@ -12,6 +12,10 @@ ListView {
     Component.onCompleted: tasksModel.load_tasks()
   }
 
+  function refresh() {
+    tasksModel.load_tasks()
+  }
+
   anchors.fill: parent
   model: tasksModel.tasks
   anchors.margins: 30

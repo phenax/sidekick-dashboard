@@ -131,11 +131,27 @@ Window {
           height: content.height
 
           Item {
-            Widget.TaskList { }
+            Widget.TaskList {
+              id: taskList
+            }
           }
 
           Item {
-            Text { text: "foobar" }
+            Column {
+              spacing: 5
+
+              Text {
+                text: "Temporary testing zone"
+                color: "white"
+                font.family: contentFont.name
+                font.pointSize: 14
+              }
+
+              Button {
+                text: "Refresh task list"
+                onClicked: taskList.refresh()
+              }
+            }
           }
         }
       }
