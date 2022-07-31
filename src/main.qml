@@ -104,7 +104,7 @@ Window {
 
           ScaledButton {
             text: "⇐"
-            onClicked: tabState.next()
+            onClicked: tabState.prev()
           }
 
           Text {
@@ -120,7 +120,7 @@ Window {
 
           ScaledButton {
             text: "⇒"
-            onClicked: tabState.prev()
+            onClicked: tabState.next()
           }
         }
 
