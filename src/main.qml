@@ -29,6 +29,14 @@ Window {
     source: "../assets/Oxanium-Regular.ttf"
   }
 
+  ConfigModel {
+    id: globalConfig
+    onRefreshed: {
+      console.log("refreshing")
+      taskList.refresh()
+    }
+  }
+
   Column {
     anchors.fill: parent
     spacing: 0
@@ -131,6 +139,13 @@ Window {
           height: content.height
 
           Item {
+            Timer {
+              interval: 8000
+              running: true;
+              repeat: true
+              onTriggered: globalConfig.refresh()
+            }
+
             Widget.TaskList {
               id: taskList
             }
@@ -149,11 +164,6 @@ Window {
                 color: "white"
                 font.family: contentFont.name
                 font.pointSize: 14
-              }
-
-              Button {
-                text: "Refresh task list"
-                onClicked: taskList.refresh()
               }
             }
           }

@@ -8,15 +8,33 @@ pub struct TaskData {
   pub checked: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Config {
   pub today: Vec<TaskData>,
 }
 
 const FILENAME: &str = "/home/imsohexy/nixos/extras/notes/today.yml";
 
+static mut GLOBAL_CONFIG: Option<Config> = None;
+
 impl Config {
-  pub fn load_file() -> Self {
+  pub fn get() -> Self {
+    unsafe {
+      if let Some(cfg) = GLOBAL_CONFIG.clone() {
+        return cfg;
+      }
+
+      let config = Self::load_config_file();
+      GLOBAL_CONFIG = Some(config.clone());
+      config
+    }
+  }
+
+  pub fn reset() {
+    unsafe { GLOBAL_CONFIG = None }
+  }
+
+  fn load_config_file() -> Self {
     let contents =
       std::fs::read_to_string(FILENAME).expect("Something went wrong reading the file");
 

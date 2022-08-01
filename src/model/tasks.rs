@@ -51,7 +51,7 @@ pub struct TasksModel {
 
 impl TasksModel {
   fn load_tasks(&mut self) {
-    let d = Config::load_file();
+    let d = Config::get();
 
     self
       .tasks
