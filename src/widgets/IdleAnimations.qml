@@ -16,16 +16,10 @@ Item {
     renderStrategy: Canvas.Threaded
 
     onPaint: {
-      const color = "#e95180"
-      const draw = (ctx, fn) => {
-        ctx.save();
-        ctx.beginPath();
-        fn(ctx);
-        ctx.restore();
-      };
-      const circle = (ctx, x, y, r) => ctx.arc(x, y, r, 0, Math.PI * 2);
+      const ctx = getContext('2d')
 
-      const ctx = getContext("2d")
+      const color = "#574b90"
+      const speed = 0.0002
 
       function render(ctx, rotation) {
         const { width, height } = ctx.canvas;
@@ -34,25 +28,28 @@ Item {
 
         ctx.clearRect(0, 0, width, height);
 
-        Array.from(Array(600), (_, i) => i).forEach(n => {
-          const opacity = n % 2 === 0 ? 1 : 0.4 // ((rotation * 1000) % 1000) / 1000
+        for (let n = 0; n < 465; n++) {
+          const opacity = n % 2 === 0 ? 1 : 0.2
 
-          draw(ctx, () => {
-            ctx.fillStyle = color;
-            ctx.globalAlpha = opacity;
-            const x = n * Math.cos(n + rotation);
-            const y = n * Math.sin(n + rotation);
-            const r = Math.min(70, n * 0.2 + 0.1) / 3;
-            circle(ctx, x + midX, y + midY, r);
-            ctx.fill();
-          });
-        });
+          ctx.save();
+          ctx.beginPath();
+
+          ctx.fillStyle = color;
+          ctx.globalAlpha = opacity;
+          const x = n * Math.cos(n + rotation);
+          const y = n * Math.sin(n + rotation);
+          const r = Math.min(70, n * 0.2 + 0.1) / 3;
+          ctx.arc(x + midX, y + midY, r, 0, Math.PI * 2)
+          ctx.fill();
+
+          ctx.restore();
+        }
       }
 
       let rotation = 0
       const run = () => {
         render(ctx, rotation, opacity)
-        rotation += 0.0004 % 2*Math.PI
+        rotation += speed % 2*Math.PI
         requestAnimationFrame(run)
       }
 
