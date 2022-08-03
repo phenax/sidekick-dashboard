@@ -56,7 +56,7 @@ impl TasksModel {
     self
       .tasks
       .borrow_mut()
-      .reset_data(d.today.iter().map(|t| Task::from((*t).clone())).collect());
+      .reset_data(d.tasks.iter().map(|t| Task::from((*t).clone())).collect());
 
     self.tasks_updated();
   }
@@ -69,7 +69,8 @@ impl TasksModel {
 
     // Save config
     Config {
-      today: tasks.iter().map(|t| t.to_data()).collect(),
+      tasks: tasks.iter().map(|t| t.to_data()).collect(),
+      ..Config::get()
     }
     .save()
   }

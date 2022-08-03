@@ -29,6 +29,12 @@ Window {
     source: "../assets/Oxanium-Regular.ttf"
   }
 
+  Timer {
+    interval: 8000
+    running: true;
+    repeat: true
+    onTriggered: globalConfig.refresh()
+  }
   ConfigModel {
     id: globalConfig
     onRefreshed: {
@@ -64,7 +70,7 @@ Window {
           id: tabState
 
           property var tabs: ["Tasks", "-", "Debug"]
-          property var activeTab: 1
+          property var activeTab: 0
 
           function next() {
             tabState.activeTab = (tabState.activeTab + 1) % tabState.tabs.length
@@ -139,15 +145,9 @@ Window {
           height: content.height
 
           Item {
-            Timer {
-              interval: 8000
-              running: true;
-              repeat: true
-              onTriggered: globalConfig.refresh()
-            }
-
             Widget.TaskList {
               id: taskList
+              taskModel: TasksModel {}
             }
           }
 

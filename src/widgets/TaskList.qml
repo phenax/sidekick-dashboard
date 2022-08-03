@@ -7,17 +7,19 @@ import Sidekick 1.0;
 import "." as Widget;
 
 ListView {
-  TasksModel {
-    id: tasksModel
-    Component.onCompleted: tasksModel.load_tasks()
+  id: listView
+  property var taskModel
+
+  Component.onCompleted: {
+    listView.taskModel.load_tasks()
   }
 
   function refresh() {
-    tasksModel.load_tasks()
+    listView.taskModel.load_tasks()
   }
 
   anchors.fill: parent
-  model: tasksModel.tasks
+  model: listView.taskModel.tasks
   anchors.margins: 30
   spacing: 5
   clip: true
@@ -28,7 +30,7 @@ ListView {
 
     Widget.Checkbox {
       checked: model.checked
-      onChanged: checked => tasksModel.set_checked(model.index, checked)
+      onChanged: checked => listView.taskModel.set_checked(model.index, checked)
     }
   }
 }

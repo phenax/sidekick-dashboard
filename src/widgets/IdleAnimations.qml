@@ -48,7 +48,7 @@ Item {
 
       let rotation = 0
       const run = () => {
-        render(ctx, rotation, opacity)
+        render(ctx, rotation)
         rotation += speed % 2*Math.PI
         requestAnimationFrame(run)
       }

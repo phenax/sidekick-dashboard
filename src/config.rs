@@ -9,8 +9,15 @@ pub struct TaskData {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
+pub struct DailyTasks {
+  pub tasks: Vec<TaskData>,
+  pub date: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Config {
-  pub today: Vec<TaskData>,
+  pub tasks: Vec<TaskData>,
+  pub daily: DailyTasks,
 }
 
 const FILENAME: &str = "/home/imsohexy/nixos/extras/notes/today.yml";
@@ -42,7 +49,7 @@ impl Config {
   }
 
   pub fn save(&self) {
-    let data = serde_yaml::to_string(self).expect("Cant deserialize");
+    let data = serde_yaml::to_string(self).expect("Cant serialize");
     std::fs::write(FILENAME, data).expect("Unable to write to file");
   }
 }
