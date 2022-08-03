@@ -38,8 +38,9 @@ Window {
   ConfigModel {
     id: globalConfig
     onRefreshed: {
-      console.log("refreshing")
+      console.log("[reloaded config]")
       taskList.refresh()
+      dailyList.refresh()
     }
   }
 
@@ -69,7 +70,7 @@ Window {
         Item {
           id: tabState
 
-          property var tabs: ["Tasks", "-", "Debug"]
+          property var tabs: ["Tasks", "Daily todo", "-"]
           property var activeTab: 0
 
           function next() {
@@ -152,20 +153,14 @@ Window {
           }
 
           Item {
-            Widget.IdleAnimations { }
+            Widget.TaskList {
+              id: dailyList
+              taskModel: DailyModel {}
+            }
           }
 
           Item {
-            Column {
-              spacing: 5
-
-              Text {
-                text: "Temporary testing zone"
-                color: "white"
-                font.family: contentFont.name
-                font.pointSize: 14
-              }
-            }
+            Widget.IdleAnimations { }
           }
         }
       }

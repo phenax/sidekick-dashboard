@@ -1,40 +1,8 @@
-use crate::config::{Config, TaskData};
-use qmetaobject::{prelude::*, SimpleListItem, SimpleListModel};
+use crate::config::Config;
+use crate::model::utils::task::{Task, TaskListModel};
+use qmetaobject::{prelude::*, SimpleListModel};
 use std::cell::RefCell;
 use std::ops::Index;
-
-#[derive(SimpleListItem, QObject, Default)]
-struct Task {
-  base: qt_base_class!(trait QObject),
-
-  pub text: qt_property!(QString),
-  pub checked: qt_property!(bool),
-}
-
-impl Task {
-  fn from(data: TaskData) -> Self {
-    Self {
-      text: data.text.into(),
-      checked: data.checked,
-      ..Self::default()
-    }
-  }
-
-  fn to_data(&self) -> TaskData {
-    TaskData {
-      text: self.text.to_string(),
-      checked: self.checked,
-    }
-  }
-
-  fn set_checked(&self, checked: bool) -> Self {
-    Self {
-      checked,
-      text: self.text.clone(),
-      ..Self::default()
-    }
-  }
-}
 
 #[derive(QObject, Default)]
 pub struct TasksModel {
@@ -49,7 +17,7 @@ pub struct TasksModel {
   set_checked: qt_method!(fn(&mut self, index: usize, checked: bool)),
 }
 
-impl TasksModel {
+impl TaskListModel for TasksModel {
   fn load_tasks(&mut self) {
     let d = Config::get();
 
