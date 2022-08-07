@@ -15,7 +15,6 @@ mkShell rec {
   buildInputs = [
     # Build tools
     rust
-    nodePackages.nodemon
 
     # Lib deps
     pkg-config
