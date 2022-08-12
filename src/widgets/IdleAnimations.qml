@@ -4,12 +4,6 @@ import Sidekick 1.0;
 Item {
   anchors.fill: parent
 
-  Timer {
-    interval: 500
-    running: true;
-    repeat: true
-  }
-
   Canvas {
     anchors.fill: parent
     anchors.topMargin: 10

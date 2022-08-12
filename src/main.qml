@@ -2,6 +2,7 @@ import QtQuick 2.9;
 import QtQuick.Window 2.0;
 import QtQuick.Layouts 1.15;
 import QtQuick.Controls 1.4;
+import QtQuick.Shapes 1.15;
 
 import Sidekick 1.0;
 import "widgets" as Widget;
@@ -13,11 +14,11 @@ Window {
   width: 600
   height: 800
 
-  property var primaryColor: "#000207";
-  property var accentColor: "#4e3aA3";
-  property var textColor: "white";
+  property var primaryColor: "#000207"
+  property var accentColor: "#4e3aA3"
+  property var textColor: "white"
 
-  property var contentBackground: "#0f0c19";
+  property var contentBackground: "#0f0c19"
 
   FontLoader {
     id: titleFont
@@ -31,7 +32,7 @@ Window {
 
   Timer {
     interval: 8000
-    running: true;
+    running: true
     repeat: true
     onTriggered: globalConfig.refresh()
   }
@@ -71,7 +72,7 @@ Window {
           id: tabState
 
           property var tabs: ["Tasks", "Daily todo", "-", "Focus mode"]
-          property var activeTab: 0
+          property var activeTab: 3
 
           function getNextTab() {
             return (tabState.activeTab + 1) % tabState.tabs.length
@@ -166,6 +167,75 @@ Window {
           }
         }
 
+        component FocusMode: Item {
+          id: focusMode
+          anchors.fill: parent
+
+          readonly property var startTime: Date.now()
+          readonly property var duration: 3 * 1000
+
+          property var current: 0
+          property bool isComplete: current === 1
+
+          Timer {
+            interval: 100
+            running: true
+            repeat: true
+            onTriggered: {
+              focusMode.current = Math.min(1, (Date.now() - focusMode.startTime) / focusMode.duration)
+              canvas.requestPaint()
+            }
+          }
+
+          Canvas {
+            id: canvas
+            anchors.fill: parent
+            renderStrategy: Canvas.Threaded
+
+            readonly property int radius: Math.min(width, height)/2 - 30
+            readonly property int thickness: 20
+
+            function getCurrentTime() {
+              const timeInMs = focusMode.current * focusMode.duration
+              const timeInSecs = Math.floor(timeInMs / 1000)
+              const minutes = Math.floor(timeInSecs / 60)
+              const seconds = timeInSecs % 60
+
+              return `${minutes.toFixed(0).padStart(2, '0')}:${seconds.toFixed(0).padStart(2, '0')}`
+            }
+
+            onPaint: {
+              const ctx = getContext('2d')
+              ctx.clearRect(0, 0, canvas.width, canvas.height)
+              const midX = canvas.width / 2
+              const midY = canvas.height / 2
+
+              const arc = (start, end) => {
+                const offset = Math.PI/2
+                ctx.beginPath()
+                ctx.lineWidth = thickness
+                ctx.arc(midX, midY, radius, start - offset, end - offset)
+                ctx.stroke()
+              }
+
+              ctx.strokeStyle = primaryColor
+              arc(0, 2 * Math.PI)
+
+              ctx.strokeStyle = isComplete ? "white" : accentColor
+              arc(0, current * 2 * Math.PI)
+
+              const fontSize = radius / 2
+              Object.assign(ctx, {
+                fillStyle: textColor,
+                textAlign: 'center',
+                textBaseline: 'middle',
+                font: `${fontSize}px ${titleFont.name}`,
+              })
+              ctx.fillText(getCurrentTime(), midX, midY + fontSize / 10)
+            }
+          }
+        }
+
         StackLayout {
           id: tabStack
           currentIndex: tabState.activeTab
@@ -191,19 +261,8 @@ Window {
           }
 
           Item {
-            // Widget.FocusMode {
-            //   id: focusMode
-            // }
-            Text {
-              text: "Hel;lo world"
-              color: textColor
-              font.family: contentFont.name
-              font.pointSize: 16
-              horizontalAlignment: Text.AlignHCenter
-              verticalAlignment: Text.AlignVCenter
-            }
+            FocusMode { }
           }
-
         }
       }
     }
