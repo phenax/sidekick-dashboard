@@ -70,25 +70,39 @@ Window {
         Item {
           id: tabState
 
-          property var tabs: ["Tasks", "Daily todo", "-"]
+          property var tabs: ["Tasks", "Daily todo", "-", "Focus mode"]
           property var activeTab: 0
 
+          function getNextTab() {
+            return (tabState.activeTab + 1) % tabState.tabs.length
+          }
+          function getPrevTab() {
+            return tabState.activeTab == 0 ? tabState.tabs.length - 1 : tabState.activeTab - 1
+          }
+
           function next() {
-            tabState.activeTab = (tabState.activeTab + 1) % tabState.tabs.length
+            tabState.activeTab = tabState.getNextTab()
           }
           function prev() {
-            tabState.activeTab = tabState.activeTab == 0 ? tabState.tabs.length - 1 : tabState.activeTab - 1
+            tabState.activeTab = tabState.getPrevTab()
+          }
+          function getNextTabLabel() {
+            return tabState.tabs[tabState.getNextTab()]
+          }
+          function getPrevTabLabel() {
+            return tabState.tabs[tabState.getPrevTab()]
           }
         }
 
         Row {
           spacing: 0
           width: parent.width
-          height: 30
+          height: 45
 
           component ScaledButton: Rectangle {
             id: arrowBtn
-            property var text
+            property var icon
+            property var label
             signal clicked
 
             readonly property var activeColor: "#30000000"
@@ -106,19 +120,31 @@ Window {
               onExited: arrowBtn.color = defaultColor
             }
 
-            Text {
-              text: arrowBtn.text
+            Column {
               anchors.fill: parent
-              color: textColor
-              font.family: titleFont.name
-              font.pointSize: 16
-              horizontalAlignment: Text.AlignHCenter
-              verticalAlignment: Text.AlignVCenter
+
+              Text {
+                width: parent.width
+                text: arrowBtn.icon
+                color: textColor
+                font.family: titleFont.name
+                font.pointSize: 16
+                horizontalAlignment: Text.AlignHCenter
+              }
+              Text {
+                width: parent.width
+                text: arrowBtn.label
+                color: textColor
+                font.family: titleFont.name
+                font.pointSize: 8
+                horizontalAlignment: Text.AlignHCenter
+              }
             }
           }
 
           ScaledButton {
-            text: "⇐"
+            icon: "⇐"
+            label: tabState.getPrevTabLabel()
             onClicked: tabState.prev()
           }
 
@@ -134,7 +160,8 @@ Window {
           }
 
           ScaledButton {
-            text: "⇒"
+            icon: "⇒"
+            label: tabState.getNextTabLabel()
             onClicked: tabState.next()
           }
         }
@@ -162,6 +189,21 @@ Window {
           Item {
             Widget.IdleAnimations { }
           }
+
+          Item {
+            // Widget.FocusMode {
+            //   id: focusMode
+            // }
+            Text {
+              text: "Hel;lo world"
+              color: textColor
+              font.family: contentFont.name
+              font.pointSize: 16
+              horizontalAlignment: Text.AlignHCenter
+              verticalAlignment: Text.AlignVCenter
+            }
+          }
+
         }
       }
     }
