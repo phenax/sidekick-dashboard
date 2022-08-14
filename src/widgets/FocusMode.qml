@@ -29,22 +29,29 @@ Column {
     }
   }
 
-  Text {
-    id: focusText
-    text: focusMode.text
+  Rectangle {
+    id: focusTextWrap
     width: parent.width
-    color: textColor
-    font.family: contentFont.name
-    font.pointSize: 24
-    wrapMode: Text.WordWrap
-    horizontalAlignment: Text.AlignHCenter
-    verticalAlignment: Text.AlignVCenter
+    height: focusText.contentHeight + 40
+    color: accentColor
+
+    Text {
+      id: focusText
+      width: parent.width
+      padding: 20
+      text: focusMode.text
+      color: textColor
+      font.family: contentFont.name
+      font.pointSize: 22
+      wrapMode: Text.WordWrap
+      horizontalAlignment: Text.AlignHCenter
+    }
   }
 
   Canvas {
     id: canvas
     width: parent.width
-    height: parent.height - focusText.height
+    height: parent.height - focusTextWrap.height
     renderStrategy: Canvas.Threaded
 
     readonly property int radius: Math.min(width, height)/2 - 30 - 2*thickness

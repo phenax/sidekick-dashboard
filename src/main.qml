@@ -71,7 +71,7 @@ Window {
           id: tabState
 
           property var tabs: ["Tasks", "Daily todo", "-", "Focus mode"]
-          property var activeTab: 0
+          property var activeTab: 3
 
           function getNextTab() {
             return (tabState.activeTab + 1) % tabState.tabs.length
@@ -203,6 +203,7 @@ Window {
           Item {
             Widget.FocusMode {
               text: taskModel.focus
+              Component.onCompleted: taskModel.set_focus("No task selected")
             }
           }
         }
