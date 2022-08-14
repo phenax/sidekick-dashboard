@@ -11,7 +11,7 @@ Column {
 
   property var text
 
-  readonly property var duration: 3 * 1000
+  readonly property var duration: 20 * 60 * 1000
 
   property var current: 0
   readonly property bool isComplete: current >= 1
