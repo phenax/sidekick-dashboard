@@ -38,7 +38,6 @@ ListView {
 
     Rectangle {
       id: focusBtn
-      anchors.right: parent.right
       height: parent.height
       width: 40
       color: primaryColor

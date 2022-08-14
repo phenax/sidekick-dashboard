@@ -14,7 +14,7 @@ Window {
   height: 800
 
   property var primaryColor: "#000207"
-  property var accentColor: "#4e3aA3"
+  property var accentColor: "#442fa7"
   property var textColor: "white"
 
   property var contentBackground: "#0f0c19"
@@ -71,7 +71,7 @@ Window {
           id: tabState
 
           property var tabs: ["Tasks", "Daily todo", "λ", "Focus mode"]
-          property var activeTab: 3
+          property var activeTab: 0
 
           function getNextTab() {
             return (tabState.activeTab + 1) % tabState.tabs.length

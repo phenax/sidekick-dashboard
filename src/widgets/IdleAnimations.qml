@@ -12,7 +12,7 @@ Item {
     onPaint: {
       const ctx = getContext('2d')
 
-      const color = "#574b90"
+      const color = accentColor
       const speed = 0.0002
 
       function render(ctx, rotation) {
