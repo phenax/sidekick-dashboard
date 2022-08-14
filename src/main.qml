@@ -173,7 +173,10 @@ Window {
         TasksModel {
           id: taskModel
           focus: "No task selected"
-          onFocus_updated: tabState.openFocusMode()
+          onFocus_updated: {
+            tabState.openFocusMode()
+            focusMode.reset()
+          }
         }
 
         StackLayout {
@@ -203,6 +206,7 @@ Window {
 
           Item {
             Widget.FocusMode {
+              id: focusMode
               text: taskModel.focus
             }
           }

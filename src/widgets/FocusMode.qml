@@ -11,11 +11,14 @@ Column {
 
   property var text
 
-  property var startTime: 0
-  readonly property var duration: 30 * 60 * 1000
+  readonly property var duration: 3 * 1000
 
   property var current: 0
-  property bool isComplete: current === 1
+  readonly property bool isComplete: current >= 1
+
+  function reset() {
+    focusMode.current = 0
+  }
 
   Timer {
     id: timer
@@ -23,18 +26,15 @@ Column {
     running: false
     repeat: true
     onTriggered: {
-      if (isComplete) {
+      if (focusMode.isComplete) {
         timer.running = false
       } else {
-        focusMode.current = focusMode.current + interval/focusMode.duration
+        focusMode.current = Math.min(1, focusMode.current + interval/focusMode.duration)
         canvas.requestPaint()
       }
     }
 
     function toggle() {
-      if (focusMode.startTime === 0 && !timer.running) {
-        focusMode.startTime = Date.now()
-      }
       timer.running = !timer.running
     }
   }
