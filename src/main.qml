@@ -70,8 +70,8 @@ Window {
         Item {
           id: tabState
 
-          property var tabs: ["Tasks", "Daily todo", "-", "Focus mode"]
-          property var activeTab: 0
+          property var tabs: ["Tasks", "Daily todo", "λ", "Focus mode"]
+          property var activeTab: 3
 
           function getNextTab() {
             return (tabState.activeTab + 1) % tabState.tabs.length

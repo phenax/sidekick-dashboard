@@ -11,21 +11,31 @@ Column {
 
   property var text
 
-  readonly property var startTime: Date.now()
-  readonly property var duration: 3 * 1000
+  property var startTime: 0
+  readonly property var duration: 30 * 60 * 1000
 
   property var current: 0
   property bool isComplete: current === 1
 
   Timer {
-    interval: 100
-    running: true
+    id: timer
+    interval: 500
+    running: false
     repeat: true
     onTriggered: {
-      if (!isComplete) {
-        focusMode.current = Math.min(1, (Date.now() - focusMode.startTime) / focusMode.duration)
+      if (isComplete) {
+        timer.running = false
+      } else {
+        focusMode.current = focusMode.current + interval/focusMode.duration
         canvas.requestPaint()
       }
+    }
+
+    function toggle() {
+      if (focusMode.startTime === 0 && !timer.running) {
+        focusMode.startTime = Date.now()
+      }
+      timer.running = !timer.running
     }
   }
 
@@ -33,13 +43,13 @@ Column {
     id: focusTextWrap
     width: parent.width
     height: focusText.contentHeight + 40
-    color: accentColor
+    color: timer.running ? accentColor : primaryColor
 
     Text {
       id: focusText
       width: parent.width
       padding: 20
-      text: focusMode.text
+      text:  focusMode.text
       color: textColor
       font.family: contentFont.name
       font.pointSize: 22
@@ -66,6 +76,11 @@ Column {
       return `${minutes.toFixed(0).padStart(2, '0')}:${seconds.toFixed(0).padStart(2, '0')}`
     }
 
+    MouseArea {
+      anchors.fill: parent
+      onClicked: timer.toggle()
+    }
+
     onPaint: {
       const ctx = getContext('2d')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -88,7 +103,7 @@ Column {
 
       const fontSize = radius / 2
       Object.assign(ctx, {
-        fillStyle: textColor,
+        fillStyle: timer.running || focusMode.isComplete ? textColor : primaryColor,
         textAlign: 'center',
         textBaseline: 'middle',
         font: `${fontSize}px ${titleFont.name}`,
