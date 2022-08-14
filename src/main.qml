@@ -167,9 +167,12 @@ Window {
           }
         }
 
-        component FocusMode: Item {
+        component FocusMode: Column {
           id: focusMode
           anchors.fill: parent
+          anchors.topMargin: 50
+
+          property var text: "CX - Protocol block undo issue"
 
           readonly property var startTime: Date.now()
           readonly property var duration: 3 * 1000
@@ -182,17 +185,32 @@ Window {
             running: true
             repeat: true
             onTriggered: {
-              focusMode.current = Math.min(1, (Date.now() - focusMode.startTime) / focusMode.duration)
-              canvas.requestPaint()
+              if (!isComplete) {
+                focusMode.current = Math.min(1, (Date.now() - focusMode.startTime) / focusMode.duration)
+                canvas.requestPaint()
+              }
             }
+          }
+
+          Text {
+            id: focusText
+            text: focusMode.text
+            width: parent.width
+            color: textColor
+            font.family: contentFont.name
+            font.pointSize: 24
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
           }
 
           Canvas {
             id: canvas
-            anchors.fill: parent
+            width: parent.width
+            height: parent.height - focusText.height
             renderStrategy: Canvas.Threaded
 
-            readonly property int radius: Math.min(width, height)/2 - 30
+            readonly property int radius: Math.min(width, height)/2 - 30 - 2*thickness
             readonly property int thickness: 20
 
             function getCurrentTime() {
