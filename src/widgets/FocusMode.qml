@@ -18,6 +18,7 @@ Column {
 
   function reset() {
     focusMode.current = 0
+    canvas.requestPaint()
   }
 
   Timer {
