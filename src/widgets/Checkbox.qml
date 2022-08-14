@@ -13,10 +13,9 @@ Rectangle {
 
   signal changed(bool checked)
 
-  property var backgroundColor: "#000207";
-  property var highlightColor: "#4e3aA3";
-  property var textColor: "white";
-  property var checkboxBorderColor: "#0f0c19";
+  property var backgroundColor: primaryColor;
+  property var highlightColor: accentColor;
+  property var checkboxBorderColor: contentBackground;
 
   color: backgroundColor
   width: parent.width

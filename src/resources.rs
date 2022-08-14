@@ -13,5 +13,6 @@ qrc!(pub load_resources,
     "src/widgets/TaskList.qml",
     "src/widgets/Checkbox.qml",
     "src/widgets/IdleAnimations.qml",
+    "src/widgets/FocusMode.qml",
   },
 );
