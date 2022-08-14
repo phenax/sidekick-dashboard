@@ -25,7 +25,7 @@ ListView {
   spacing: 5
   clip: true
 
-  delegate: Item {
+  delegate: Row {
     width: ListView.view.width
     height: childrenRect.height
 
@@ -33,6 +33,7 @@ ListView {
       text: model.text
       checked: model.checked
       onChanged: checked => listView.taskModel.set_checked(model.index, checked)
+      width: parent.width - focusBtn.width
     }
 
     Rectangle {
@@ -40,7 +41,7 @@ ListView {
       anchors.right: parent.right
       height: parent.height
       width: 40
-      color: "transparent"
+      color: primaryColor
       border.color: "transparent"
       border.width: 1
 

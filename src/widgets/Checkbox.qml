@@ -36,6 +36,7 @@ Rectangle {
     spacing: 16
 
     Rectangle {
+      id: checkRect
       width: 35
       height: 35
       color: backgroundColor
@@ -57,7 +58,7 @@ Rectangle {
       font.family: contentFont.name
       y: 5
       wrapMode: Text.WordWrap
-      width: parent.width
+      width: parent.width - checkRect.width
       verticalAlignment: Text.AlignVCenter
     }
   }
