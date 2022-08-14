@@ -72,7 +72,7 @@ Window {
           id: tabState
 
           property var tabs: ["Tasks", "Daily todo", "-", "Focus mode"]
-          property var activeTab: 3
+          property var activeTab: 0
 
           function getNextTab() {
             return (tabState.activeTab + 1) % tabState.tabs.length
@@ -92,6 +92,10 @@ Window {
           }
           function getPrevTabLabel() {
             return tabState.tabs[tabState.getPrevTab()]
+          }
+
+          function openFocusMode() {
+            tabState.activeTab = tabState.tabs.indexOf("Focus mode")
           }
         }
 
@@ -172,7 +176,7 @@ Window {
           anchors.fill: parent
           anchors.topMargin: 50
 
-          property var text: "CX - Protocol block undo issue"
+          property var text
 
           readonly property var startTime: Date.now()
           readonly property var duration: 3 * 1000
@@ -254,6 +258,11 @@ Window {
           }
         }
 
+        TasksModel {
+          id: taskModel
+          onFocus_updated: tabState.openFocusMode()
+        }
+
         StackLayout {
           id: tabStack
           currentIndex: tabState.activeTab
@@ -263,7 +272,8 @@ Window {
           Item {
             Widget.TaskList {
               id: taskList
-              taskModel: TasksModel {}
+              taskModel: taskModel
+              withFocus: true
             }
           }
 
@@ -279,7 +289,9 @@ Window {
           }
 
           Item {
-            FocusMode { }
+            FocusMode {
+              text: taskModel.focus
+            }
           }
         }
       }

@@ -9,6 +9,7 @@ Rectangle {
   id: checkbox
 
   property bool checked
+  property string text
 
   signal changed(bool checked)
 
@@ -43,7 +44,7 @@ Rectangle {
       border.color: checkboxBorderColor
 
       Rectangle {
-        visible: model.checked
+        visible: checkbox.checked
         color: highlightColor
         anchors.margins: 1
         anchors.fill: parent
@@ -51,7 +52,7 @@ Rectangle {
     }
 
     Text {
-      text: model.text
+      text: checkbox.text
       color: textColor
       font.pointSize: 20
       font.family: contentFont.name

@@ -8,13 +8,16 @@ use std::ops::Index;
 pub struct TasksModel {
   base: qt_base_class!(trait QObject),
   tasks: qt_property!(RefCell<SimpleListModel<Task>>; NOTIFY tasks_updated),
+  focus: qt_property!(QString; NOTIFY focus_updated),
 
   // Signals
   tasks_updated: qt_signal!(),
+  focus_updated: qt_signal!(),
 
   // Methods
   load_tasks: qt_method!(fn(&mut self)),
   set_checked: qt_method!(fn(&mut self, index: usize, checked: bool)),
+  set_focus: qt_method!(fn(&mut self, task: String)),
 }
 
 impl TaskListModel for TasksModel {
@@ -41,5 +44,10 @@ impl TaskListModel for TasksModel {
       ..Config::get()
     }
     .save()
+  }
+
+  fn set_focus(&mut self, task: String) {
+    self.focus = task.into();
+    self.focus_updated();
   }
 }

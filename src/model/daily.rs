@@ -71,4 +71,6 @@ impl TaskListModel for DailyModel {
     }
     .save()
   }
+
+  fn set_focus(&mut self, task: String) {}
 }
