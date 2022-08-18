@@ -4,6 +4,10 @@ import QtQuick.Layouts 1.15;
 import QtQuick.Controls 1.4;
 
 
+// TODO: Allow extending time (+15 minutes)
+// TODO: Allow resetting when timer is complete
+// TODO: Use absolute current time
+// TODO: play a bell when timer is done + flash clock for 10 seconds?
 Column {
   id: focusMode
   anchors.fill: parent
@@ -11,10 +15,10 @@ Column {
 
   property var text
 
-  readonly property var duration: 20 * 60 * 1000
+  readonly property var duration: 5 * 1000
 
   property var current: 0
-  readonly property bool isComplete: current >= 1
+  readonly property bool isComplete: current >= duration
 
   function reset() {
     focusMode.current = 0
@@ -30,7 +34,7 @@ Column {
       if (focusMode.isComplete) {
         timer.running = false
       } else {
-        focusMode.current = Math.min(1, focusMode.current + interval/focusMode.duration)
+        focusMode.current = Math.min(focusMode.duration, focusMode.current + interval)
         canvas.requestPaint()
       }
     }
@@ -52,7 +56,7 @@ Column {
       padding: 20
       text:  focusMode.text
       color: textColor
-      font.family: contentFont.name
+      font.family: titleFont.name
       font.pointSize: 22
       wrapMode: Text.WordWrap
       horizontalAlignment: Text.AlignHCenter
@@ -65,11 +69,11 @@ Column {
     height: parent.height - focusTextWrap.height
     renderStrategy: Canvas.Threaded
 
-    readonly property int radius: Math.min(width, height)/2 - 30 - 2*thickness
+    readonly property int radius: Math.max(10, Math.min(width, height)/2 - 30 - 2*thickness)
     readonly property int thickness: 20
 
     function getCurrentTime() {
-      const timeInMs = focusMode.current * focusMode.duration
+      const timeInMs = focusMode.current
       const timeInSecs = Math.floor(timeInMs / 1000)
       const minutes = Math.floor(timeInSecs / 60)
       const seconds = timeInSecs % 60
@@ -100,7 +104,7 @@ Column {
       arc(0, 2 * Math.PI)
 
       ctx.strokeStyle = isComplete ? "white" : accentColor
-      arc(0, current * 2 * Math.PI)
+      arc(0, 2 * Math.PI * focusMode.current/focusMode.duration)
 
       const fontSize = radius / 2
       Object.assign(ctx, {
