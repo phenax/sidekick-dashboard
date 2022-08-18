@@ -3,9 +3,6 @@ import QtQuick.Window 2.0;
 import QtQuick.Layouts 1.15;
 import QtQuick.Controls 1.4;
 
-
-// TODO: Allow extending time (+15 minutes)
-// TODO: play a bell when timer is done + flash clock for 10 seconds?
 Column {
   id: focusMode
   anchors.fill: parent
@@ -13,14 +10,18 @@ Column {
 
   property var text
 
-  readonly property var duration: 5 * 1000
+  readonly property var duration: 30 * 60 * 1000
 
   property var current: 0
   readonly property bool isComplete: current >= duration
 
-  function reset() {
-    focusMode.current = 0
+  function setCurrent(cur) {
+    focusMode.current = cur
     canvas.requestPaint()
+  }
+
+  function reset() {
+    setCurrent(0)
   }
 
   Timer {
@@ -32,15 +33,14 @@ Column {
       if (focusMode.isComplete) {
         timer.running = false
       } else {
-        focusMode.current = Math.min(focusMode.duration, focusMode.current + interval)
-        canvas.requestPaint()
+        const cur = Math.min(focusMode.duration, focusMode.current + interval)
+        setCurrent(cur)
       }
     }
 
     function toggle() {
       if (focusMode.isComplete) {
-        focusMode.current = 0
-        canvas.requestPaint()
+        focusMode.setCurrent(0)
       }
 
       timer.running = !timer.running
@@ -51,16 +51,20 @@ Column {
     id: focusTextWrap
     width: parent.width
     height: focusText.contentHeight + 40
-    color: timer.running ? accentColor : primaryColor
+    color:
+      focusMode.isComplete ? "white"
+      : timer.running ? accentColor
+      : primaryColor
 
     Text {
       id: focusText
       width: parent.width
       padding: 20
       text:  focusMode.text
-      color: textColor
+      color: focusMode.isComplete ? primaryColor : textColor
       font.family: titleFont.name
       font.pointSize: 22
+      font.bold: true
       wrapMode: Text.WordWrap
       horizontalAlignment: Text.AlignHCenter
     }
