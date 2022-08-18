@@ -7,13 +7,20 @@ Column {
   id: focusMode
   anchors.fill: parent
   anchors.topMargin: 50
+  property var __mins: 60 * 1000
 
+  // prop
   property var text
 
-  readonly property var duration: 30 * 60 * 1000
-
+  // state
+  property var duration: 30 * __mins
   property var current: 0
   readonly property bool isComplete: current >= duration
+
+  function setDuration(cur) {
+    focusMode.duration = cur
+    canvas.requestPaint()
+  }
 
   function setCurrent(cur) {
     focusMode.current = cur
@@ -67,6 +74,27 @@ Column {
       font.bold: true
       wrapMode: Text.WordWrap
       horizontalAlignment: Text.AlignHCenter
+    }
+
+    MouseArea {
+      visible: focusMode.isComplete
+      anchors.fill: parent
+      onClicked: {
+        setDuration(focusMode.duration + 15 * __mins)
+        timer.running = true
+      }
+    }
+
+    Text {
+      visible: focusMode.isComplete
+      text: "+ 15"
+      font.pointSize: 14
+      width: 80
+      height: parent.height
+      anchors.right: parent.right
+      font.family: titleFont.name
+      horizontalAlignment: Text.AlignHCenter
+      verticalAlignment: Text.AlignVCenter
     }
   }
 
