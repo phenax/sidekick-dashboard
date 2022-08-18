@@ -5,8 +5,6 @@ import QtQuick.Controls 1.4;
 
 
 // TODO: Allow extending time (+15 minutes)
-// TODO: Allow resetting when timer is complete
-// TODO: Use absolute current time
 // TODO: play a bell when timer is done + flash clock for 10 seconds?
 Column {
   id: focusMode
@@ -40,6 +38,11 @@ Column {
     }
 
     function toggle() {
+      if (focusMode.isComplete) {
+        focusMode.current = 0
+        canvas.requestPaint()
+      }
+
       timer.running = !timer.running
     }
   }
