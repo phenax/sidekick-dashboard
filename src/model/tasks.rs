@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::config::{Config, TaskData};
 use crate::model::utils::task::{Task, TaskListModel};
 use qmetaobject::{prelude::*, SimpleListModel};
 use std::cell::RefCell;
@@ -17,7 +17,17 @@ pub struct TasksModel {
   // Methods
   load_tasks: qt_method!(fn(&mut self)),
   set_checked: qt_method!(fn(&mut self, index: usize, checked: bool)),
+  toggle_checked: qt_method!(fn(&mut self, index: usize)),
   set_focus: qt_method!(fn(&mut self, task: String)),
+  get_task_text: qt_method!(fn(&self, index: usize) -> QString),
+}
+
+fn update_tasks(tasks: Vec<TaskData>) {
+  Config {
+    tasks,
+    ..Config::get()
+  }
+  .save();
 }
 
 impl TaskListModel for TasksModel {
@@ -32,22 +42,32 @@ impl TaskListModel for TasksModel {
     self.tasks_updated();
   }
 
+  fn toggle_checked(&mut self, index: usize) {
+    let mut tasks = self.tasks.borrow_mut();
+    let t = tasks.index(index);
+    let t = t.set_checked(!t.checked);
+    tasks.change_line(index, t);
+    self.tasks_updated();
+
+    update_tasks(tasks.iter().map(|t| t.to_data()).collect());
+  }
+
   fn set_checked(&mut self, index: usize, checked: bool) {
     let mut tasks = self.tasks.borrow_mut();
     let t = tasks.index(index).set_checked(checked);
     tasks.change_line(index, t);
     self.tasks_updated();
 
-    // Save config
-    Config {
-      tasks: tasks.iter().map(|t| t.to_data()).collect(),
-      ..Config::get()
-    }
-    .save()
+    update_tasks(tasks.iter().map(|t| t.to_data()).collect());
   }
 
   fn set_focus(&mut self, task: String) {
     self.focus = task.into();
     self.focus_updated();
+  }
+  fn get_task_text(&self, index: usize) -> QString {
+    let tasks = self.tasks.borrow();
+    let t = tasks.index(index);
+    return t.text.clone();
   }
 }

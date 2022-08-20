@@ -19,8 +19,27 @@ ListView {
     listView.taskModel.load_tasks()
   }
 
+  property int current: 0
+
+  function length() {
+    return taskModel.tasks.rowCount()
+  }
+
+  function highlightNext() {
+    current = (current + 1) % listView.length()
+  }
+  function highlightPrev() {
+    current = current === 0 ? listView.length() - 1 : current - 1
+  }
+  function highlightFocus() {
+    taskModel.set_focus(taskModel.get_task_text(current))
+  }
+  function highlightToggle() {
+    taskModel.toggle_checked(current)
+  }
+
   anchors.fill: parent
-  model: listView.taskModel.tasks
+  model: taskModel.tasks
   anchors.margins: 30
   spacing: 5
   clip: true
@@ -29,7 +48,14 @@ ListView {
     width: ListView.view.width
     height: childrenRect.height
 
+    Rectangle {
+      width: 4
+      height: parent.height
+      color: listView.current === model.index ? accentColor : primaryColor
+    }
+
     Widget.Checkbox {
+      id: checkbox
       text: model.text
       checked: model.checked
       onChanged: checked => listView.taskModel.set_checked(model.index, checked)

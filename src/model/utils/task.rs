@@ -37,5 +37,7 @@ impl Task {
 pub trait TaskListModel {
   fn load_tasks(&mut self);
   fn set_checked(&mut self, index: usize, checked: bool);
+  fn toggle_checked(&mut self, index: usize);
   fn set_focus(&mut self, task: String);
+  fn get_task_text(&self, index: usize) -> QString;
 }

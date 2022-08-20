@@ -189,6 +189,11 @@ Window {
           height: content.height
 
           Item {
+            Shortcut { enabled: taskList.parent.visible; sequences: ["j"]; onActivated: taskList.highlightNext(); }
+            Shortcut { enabled: taskList.parent.visible; sequences: ["k"]; onActivated: taskList.highlightPrev(); }
+            Shortcut { enabled: taskList.parent.visible; sequences: ["f"]; onActivated: taskList.highlightFocus(); }
+            Shortcut { enabled: taskList.parent.visible; sequences: ["space"]; onActivated: taskList.highlightToggle(); }
+
             Widget.TaskList {
               id: taskList
               taskModel: taskModel
@@ -197,6 +202,9 @@ Window {
           }
 
           Item {
+            Shortcut { enabled: dailyList.parent.visible; sequences: ["j"]; onActivated: dailyList.highlightNext(); }
+            Shortcut { enabled: dailyList.parent.visible; sequences: ["k"]; onActivated: dailyList.highlightPrev(); }
+
             Widget.TaskList {
               id: dailyList
               taskModel: DailyModel {}
@@ -208,8 +216,9 @@ Window {
           }
 
           Item {
-            Shortcut { sequences: ["r"]; onActivated: focusMode.reset(); }
-            Shortcut { sequences: ["space"]; onActivated: focusMode.toggle(); }
+            Shortcut { enabled: focusMode.parent.visible; sequences: ["r"]; onActivated: focusMode.reset(); }
+            Shortcut { enabled: focusMode.parent.visible; sequences: ["space"]; onActivated: focusMode.toggle(); }
+
             Widget.FocusMode {
               id: focusMode
               text: taskModel.focus

@@ -15,6 +15,9 @@ pub struct DailyModel {
   // Methods
   load_tasks: qt_method!(fn(&mut self)),
   set_checked: qt_method!(fn(&mut self, index: usize, checked: bool)),
+  // toggle_checked: qt_method!(fn(&mut self, index: usize)),
+  // set_focus: qt_method!(fn(&mut self, task: String)),
+  // get_task_text: qt_method!(fn(&self, index: usize) -> QString),
 }
 
 impl TaskListModel for DailyModel {
@@ -72,5 +75,9 @@ impl TaskListModel for DailyModel {
     .save()
   }
 
+  fn toggle_checked(&mut self, _index: usize) {}
   fn set_focus(&mut self, _task: String) {}
+  fn get_task_text(&self, _index: usize) -> QString {
+    "".into()
+  }
 }
