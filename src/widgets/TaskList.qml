@@ -33,10 +33,11 @@ ListView {
       text: model.text
       checked: model.checked
       onChanged: checked => listView.taskModel.set_checked(model.index, checked)
-      width: parent.width - focusBtn.width
+      width: parent.width - (withFocus ? focusBtn.width : 0)
     }
 
     Rectangle {
+      visible: withFocus
       id: focusBtn
       height: parent.height
       width: 40
