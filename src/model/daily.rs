@@ -15,9 +15,18 @@ pub struct DailyModel {
   // Methods
   load_tasks: qt_method!(fn(&mut self)),
   set_checked: qt_method!(fn(&mut self, index: usize, checked: bool)),
-  // toggle_checked: qt_method!(fn(&mut self, index: usize)),
+  toggle_checked: qt_method!(fn(&mut self, index: usize)),
   // set_focus: qt_method!(fn(&mut self, task: String)),
   // get_task_text: qt_method!(fn(&self, index: usize) -> QString),
+}
+
+fn update_daily(tasks: Vec<TaskData>) {
+  let cfg = Config::get();
+  Config {
+    daily: DailyTasks { tasks, ..cfg.daily },
+    ..cfg
+  }
+  .save()
 }
 
 impl TaskListModel for DailyModel {
@@ -64,18 +73,20 @@ impl TaskListModel for DailyModel {
     self.tasks_updated();
 
     // Save config
-    let cfg = Config::get();
-    Config {
-      daily: DailyTasks {
-        tasks: tasks.iter().map(|t| t.to_data()).collect(),
-        ..cfg.daily
-      },
-      ..cfg
-    }
-    .save()
+    update_daily(tasks.iter().map(|t| t.to_data()).collect())
   }
 
-  fn toggle_checked(&mut self, _index: usize) {}
+  fn toggle_checked(&mut self, index: usize) {
+    let mut tasks = self.tasks.borrow_mut();
+    let t = tasks.index(index);
+    let t = t.set_checked(!t.checked);
+    tasks.change_line(index, t);
+    self.tasks_updated();
+
+    // Save config
+    update_daily(tasks.iter().map(|t| t.to_data()).collect())
+  }
+
   fn set_focus(&mut self, _task: String) {}
   fn get_task_text(&self, _index: usize) -> QString {
     "".into()

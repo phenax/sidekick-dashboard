@@ -204,6 +204,7 @@ Window {
           Item {
             Shortcut { enabled: dailyList.parent.visible; sequences: ["j"]; onActivated: dailyList.highlightNext(); }
             Shortcut { enabled: dailyList.parent.visible; sequences: ["k"]; onActivated: dailyList.highlightPrev(); }
+            Shortcut { enabled: dailyList.parent.visible; sequences: ["space"]; onActivated: dailyList.highlightToggle(); }
 
             Widget.TaskList {
               id: dailyList

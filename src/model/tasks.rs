@@ -42,6 +42,7 @@ impl TaskListModel for TasksModel {
     self.tasks_updated();
   }
 
+  // Im gonna kill myself
   fn toggle_checked(&mut self, index: usize) {
     let mut tasks = self.tasks.borrow_mut();
     let t = tasks.index(index);
