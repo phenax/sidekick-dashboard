@@ -28,7 +28,9 @@ Column {
   }
 
   function reset() {
-    setCurrent(0)
+    focusMode.current = 0
+    focusMode.duration = 30 * __mins
+    canvas.requestPaint()
   }
 
   Timer {
@@ -47,7 +49,7 @@ Column {
 
     function toggle() {
       if (focusMode.isComplete) {
-        focusMode.setCurrent(0)
+        focusMode.reset()
       }
 
       timer.running = !timer.running
@@ -108,7 +110,7 @@ Column {
     readonly property int thickness: 20
 
     function getCurrentTime() {
-      const timeInMs = focusMode.current
+      const timeInMs = focusMode.duration - focusMode.current
       const timeInSecs = Math.floor(timeInMs / 1000)
       const minutes = Math.floor(timeInSecs / 60)
       const seconds = timeInSecs % 60
