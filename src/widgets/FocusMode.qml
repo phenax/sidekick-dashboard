@@ -33,6 +33,10 @@ Column {
     canvas.requestPaint()
   }
 
+  function toggle() {
+    timer.toggle()
+  }
+
   Timer {
     id: timer
     interval: 500

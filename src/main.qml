@@ -19,6 +19,9 @@ Window {
 
   property var contentBackground: "#0f0c19"
 
+  Shortcut { sequences: ["h"]; onActivated: tabState.prev(); }
+  Shortcut { sequences: ["l"]; onActivated: tabState.next(); }
+
   FontLoader {
     id: titleFont
     source: "../assets/Oxanium-Bold.ttf"
@@ -205,6 +208,8 @@ Window {
           }
 
           Item {
+            Shortcut { sequences: ["r"]; onActivated: focusMode.reset(); }
+            Shortcut { sequences: ["space"]; onActivated: focusMode.toggle(); }
             Widget.FocusMode {
               id: focusMode
               text: taskModel.focus
