@@ -2,17 +2,12 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        sans: [
-          'Oxanium',
-          ...defaultTheme.fontFamily.sans,
-        ],
+        primary: ['Oxanium', ...defaultTheme.fontFamily.sans],
+        primarybold: ['OxaniumBold', ...defaultTheme.fontFamily.sans],
       },
       colors: {
         purple: '#442fa7',

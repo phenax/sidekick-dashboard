@@ -14,11 +14,9 @@
 
 @layer base {
   :root {
-    --font-size: 16px;
+    @apply font-primary;
 
-    color: #ffffff;
-    background-color: black;
-
+    @apply text-white;
     @apply bg-dark-800;
 
     font-synthesis: none;
