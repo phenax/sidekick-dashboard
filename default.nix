@@ -16,6 +16,19 @@ let
   rust = moz.latest.rustChannels.nightly.rust.override {
     extensions = [ "rust-src" ];
   };
+
+  libDeps = with pkgs; [
+    rust
+    pkg-config
+    libclang
+    libGL
+    at-spi2-atk
+    pango
+    gdk-pixbuf
+    gtk3
+    webkitgtk
+    libsoup
+  ];
 in
 rustPlatform.buildRustPackage rec {
   pname = "sidekick-dashboard";
@@ -34,17 +47,10 @@ rustPlatform.buildRustPackage rec {
   cargoSha256 = lib.fakeSha256; # "sha256-dgW2SlpKovw79wkdGcbVm6c8KqkbcZlvZCwCcdVBShw=";
 
   nativeBuildInputs = with pkgs; [ cmake wrapQtAppsHook clang ];
-  buildInputs = with pkgs; [
-    pkg-config
-    libclang
-    libGL
-    qt5.full
-    qtbase
-    libsForQt5.qmake
-    makeWrapper
-  ];
+  buildInputs = libDeps;
 
   passthru = {
     rust = rust;
+    libDeps = libDeps;
   };
 }
