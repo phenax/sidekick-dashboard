@@ -1,6 +1,12 @@
-with import <nixpkgs> { };
+{ stdenv, pkgs, rustPlatform, lib }:
+with pkgs.lib;
+
 let
-  src = fetchFromGitHub {
+  useFakeHash = true;
+  commitHash = "f160ec9742cacd14f8853ea6d17dc4011f85156d";
+  realSha256 = "sha256-LCFcX23dY7tFoXPgEHaD+U6g2X/9M4aE4TPfvhu6bLI=";
+
+  src = pkgs.fetchFromGitHub {
     owner = "mozilla";
     repo = "nixpkgs-mozilla";
     rev = "15b7a05f20aab51c4ffbefddb1b448e862dccb7d"; # 10th April 2022
@@ -11,25 +17,34 @@ let
     extensions = [ "rust-src" ];
   };
 in
-mkShell rec {
-  buildInputs = [
-    # Build tools
-    rust
+rustPlatform.buildRustPackage rec {
+  pname = "sidekick-dashboard";
+  version = "0.0.0";
 
-    # Lib deps
+  src = pkgs.fetchFromGitHub {
+    owner = "phenax";
+    repo = "sidekick-dashboard";
+    rev = "main"; # commitHash;
+    sha256 =
+      if useFakeHash
+      then lib.fakeSha256
+      else realSha256;
+  };
+
+  cargoSha256 = lib.fakeSha256; # "sha256-dgW2SlpKovw79wkdGcbVm6c8KqkbcZlvZCwCcdVBShw=";
+
+  nativeBuildInputs = with pkgs; [ cmake wrapQtAppsHook clang ];
+  buildInputs = with pkgs; [
     pkg-config
     libclang
     libGL
-    pkgs.qt5.full
-
-    # Dev
-    nodePackages.nodemon
-    rust-analyzer
+    qt5.full
+    qtbase
+    libsForQt5.qmake
+    makeWrapper
   ];
-  nativeBuildInputs = [ clang ];
 
-  LIBCLANG_PATH = "${libclang.lib}/lib";
-  # RUST_SRC_PATH = rust.packages.stable.rustPlatform.rustLibSrc;
-  LD_LIBRARY_PATH = lib.makeLibraryPath (buildInputs ++ nativeBuildInputs);
-  GIO_MODULE_DIR = "${glib-networking}/lib/gio/modules/";
+  passthru = {
+    rust = rust;
+  };
 }
