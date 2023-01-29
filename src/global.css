@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Oxanium';
+  src: url('/Oxanium-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'OxaniumBold';
+  src: url('/Oxanium-Bold.ttf');
+}
+
+@layer base {
+  :root {
+    --font-size: 16px;
+
+    color: #ffffff;
+    background-color: black;
+
+    @apply bg-dark-800;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+}
+

@@ -8,6 +8,7 @@ let
   devDeps = [
     nodePackages.pnpm
     nodePackages.nodemon
+    nodePackages.typescript-language-server
     rust-analyzer
   ];
 in
