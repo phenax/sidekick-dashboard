@@ -1,4 +1,4 @@
-import { not, always, compose, modify } from 'ramda'
+import { not, always, compose } from 'ramda'
 import { Switch, Match } from 'solid-js'
 import { match, _ } from '../../utils/adt'
 import { modifyPath } from '../../utils/helpers'
@@ -6,7 +6,7 @@ import { createReducer } from '../../utils/solid'
 import FocusMode, { FocussedState } from '../FocusMode'
 import { TaskItem } from './TaskItem'
 import TaskList from './TaskList'
-import { Action, TimerState, UI } from './types'
+import { Action, Effect, TimerState, UI } from './types'
 
 interface State {
   ui: UI
@@ -87,75 +87,91 @@ const startBreak = (state: State, minutes: number) =>
     state
   )
 
-const update = match<(s: State) => State, Action>({
-  GotoList: () => (state) => ({ ...state, ui: UI.List({ editing: false }) }),
-  GotoFocus: () => gotoFocus,
-  SwitchFocus: (index) =>
-    compose(
-      gotoFocus,
-      (s: State) =>
-        modifyPath(['focussedState', 'index'] as const, always(index), s),
-      startFocus
+const update = match<(s: State) => Effect<State, Action>, Action>({
+  GotoList: () => (state) =>
+    Effect.Pure({ ...state, ui: UI.List({ editing: false }) }),
+  GotoFocus: () => (state: State) => Effect.Pure(gotoFocus(state)),
+  SwitchFocus: (index) => (state: State) =>
+    Effect.Pure(
+      compose(
+        gotoFocus,
+        (s: State) =>
+          modifyPath(['focussedState', 'index'] as const, always(index), s),
+        startFocus
+      )(state)
     ),
 
-  SelectUp: () => (state) => ({
-    ...state,
-    highlightedIndex:
-      state.highlightedIndex <= 0
-        ? state.tasks.length - 1
-        : state.highlightedIndex - 1,
-  }),
-  SelectDown: () => (state) => ({
-    ...state,
-    highlightedIndex:
-      state.highlightedIndex >= state.tasks.length - 1
-        ? 0
-        : state.highlightedIndex + 1,
-  }),
+  SelectUp: () => (state) =>
+    Effect.Pure({
+      ...state,
+      highlightedIndex:
+        state.highlightedIndex <= 0
+          ? state.tasks.length - 1
+          : state.highlightedIndex - 1,
+    }),
+
+  SelectDown: () => (state) =>
+    Effect.Pure({
+      ...state,
+      highlightedIndex:
+        state.highlightedIndex >= state.tasks.length - 1
+          ? 0
+          : state.highlightedIndex + 1,
+    }),
 
   ToggleCheck: (index) => (state) =>
-    match<State, UI>({
-      List: (p) =>
-        p.editing
-          ? state
-          : modifyPath(['tasks', index, 'checked'] as const, not, state),
-      _: () => state,
-    })(state.ui),
+    Effect.Pure(
+      match<State, UI>({
+        List: (p) =>
+          p.editing
+            ? state
+            : modifyPath(['tasks', index, 'checked'] as const, not, state),
+        _: () => state,
+      })(state.ui)
+    ),
 
   SetEditing: (enable) => (state) =>
-    match<State, UI>({
-      List: (_) =>
-        modifyPath(['ui', 'editing'] as const, always(enable), state),
-      _: () => state,
-    })(state.ui),
+    Effect.Pure(
+      match<State, UI>({
+        List: (_) =>
+          modifyPath(['ui', 'editing'] as const, always(enable), state),
+        _: () => state,
+      })(state.ui)
+    ),
 
   SetContents:
     ({ index, value }) =>
     (state) =>
-      match<State, UI>({
-        List: (_) =>
-          compose(
-            (s: State) =>
-              modifyPath(['tasks', index, 'text'] as const, always(value), s),
-            (s: State) =>
-              modifyPath(['ui', 'editing'] as const, always(false), s)
-          )(state),
-        _: () => state,
-      })(state.ui),
+      Effect.Pure(
+        match<State, UI>({
+          List: (_) =>
+            compose(
+              (s: State) =>
+                modifyPath(['tasks', index, 'text'] as const, always(value), s),
+              (s: State) =>
+                modifyPath(['ui', 'editing'] as const, always(false), s)
+            )(state),
+          _: () => state,
+        })(state.ui)
+      ),
 
   Tick: () => (state) =>
-    match<State, UI>({
-      Focus: () => nextTimerState(state),
-      _: () => state,
-    })(state.ui),
+    Effect.Pure(
+      match<State, UI>({
+        Focus: () => nextTimerState(state),
+        _: () => state,
+      })(state.ui)
+    ),
 
   TakeBreak: (minutes) => (state) =>
-    match<State, UI>({
-      Focus: () => startBreak(state, minutes),
-      _: () => state,
-    })(state.ui),
+    Effect.Pure(
+      match<State, UI>({
+        Focus: () => startBreak(state, minutes),
+        _: () => state,
+      })(state.ui)
+    ),
 
-  EndBreak: () => startFocus,
+  EndBreak: () => (state: State) => Effect.Pure(startFocus(state)),
 })
 
 export default function Tasks() {

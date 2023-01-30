@@ -1,7 +1,7 @@
 import { For } from 'solid-js'
 import { createKeyboardHandler, Dispatch } from '../../utils/solid'
 import Task, { TaskItem } from './TaskItem'
-import { Action, UI } from './types'
+import { Action } from './types'
 
 interface Props {
   tasks: TaskItem[]

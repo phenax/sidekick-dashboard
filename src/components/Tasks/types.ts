@@ -30,8 +30,8 @@ export type UI = Enum<{
 }>
 export const UI = constructors<UI>()
 
-// export type Effect<State, Action> = Enum<{
-//   Pure: State
-//   Effectful: { state: State, effect: () => Promise<Action> }
-// }>
-// export const Effect = constructors<Effect<unknown, unknown>>()
+export type Effect<State, Action> = Enum<{
+  Pure: State
+  Effectful: { state: State; effect: () => Promise<Action> }
+}>
+export const Effect = constructors<Effect<any, any>>()
