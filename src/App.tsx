@@ -1,8 +1,7 @@
-import { createComputed, createMemo, createSignal } from 'solid-js'
-import { invoke } from '@tauri-apps/api/tauri'
-import Clock from './components/Clock'
-import TaskList from './components/TaskList'
 import './App.css'
+
+import Clock from './components/Clock'
+import Tasks from './components/Tasks'
 
 function App() {
   // const [greetMsg, setGreetMsg] = createSignal('')
@@ -15,7 +14,7 @@ function App() {
   return (
     <div>
       <Clock />
-      <TaskList />
+      <Tasks />
     </div>
   )
 }

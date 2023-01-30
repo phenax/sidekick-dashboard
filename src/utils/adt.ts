@@ -8,7 +8,9 @@ export const match =
     ((pattern as any)[tag.tag] || (pattern._ as any))(tag.value)
 
 export type Tag<N, V> = { tag: N; value: V }
-export type Union<T> = { [N in keyof T]: Tag<N, T[N]> }[keyof T]
+export type Enum<T> = { [N in keyof T]: Tag<N, T[N]> }[keyof T]
+
+export type _ = never
 
 export const constructors = <T extends Tag<string, any>>(): {
   [N in T['tag']]: TagValue<T, N> extends null | never
@@ -21,6 +23,5 @@ export const constructors = <T extends Tag<string, any>>(): {
       get(_, k) {
         return (value: any) => ({ tag: k, value })
       },
-    },
+    }
   ) as any
-

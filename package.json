@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "format": "prettier --write ./src/**/*.{css,tsx} && rustfmt ./src-tauri/**/*.rs",
+    "format": "prettier --write ./src && rustfmt ./src-tauri/**/*.rs",
     "build": "vite build",
     "dev": "vite",
     "serve": "vite preview",
