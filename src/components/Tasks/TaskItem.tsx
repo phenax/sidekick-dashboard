@@ -13,6 +13,7 @@ interface TaskProps {
   toggle: () => void
   submit: (text: string) => void
   cancel: () => void
+  openInFocusMode: () => void
 }
 
 export default function Task(props: TaskProps) {
@@ -32,6 +33,7 @@ export default function Task(props: TaskProps) {
 
     if (props.isHighlighted) {
       return {
+        f: () => props.openInFocusMode(),
         ' ': () => props.toggle(),
       }
     }

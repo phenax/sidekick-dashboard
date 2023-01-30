@@ -1,7 +1,7 @@
 import { For } from 'solid-js'
 import { createKeyboardHandler, Dispatch } from '../../utils/solid'
 import Task, { TaskItem } from './TaskItem'
-import { Action } from './types'
+import { Action, UI } from './types'
 
 interface Props {
   tasks: TaskItem[]
@@ -13,9 +13,13 @@ interface Props {
 export default function TaskList(props: Props) {
   createKeyboardHandler((ev) => {
     if (props.isEditing) return
+    if (ev.ctrlKey && ev.key === 'r') location.reload()
+
     ev.preventDefault()
     return {
       e: () => props.dispatch(Action.SetEditing(true)),
+      h: () => props.dispatch(Action.GotoList()),
+      l: () => props.dispatch(Action.GotoFocus()),
       j: () => props.dispatch(Action.SelectDown()),
       k: () => props.dispatch(Action.SelectUp()),
       _: () => {},
@@ -37,6 +41,9 @@ export default function TaskList(props: Props) {
             }}
             toggle={() => props.dispatch(Action.ToggleCheck(index()))}
             cancel={() => props.dispatch(Action.SetEditing(false))}
+            openInFocusMode={() =>
+              props.dispatch(Action.SwitchFocus(index()))
+            }
           />
         )}
       </For>

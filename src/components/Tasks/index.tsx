@@ -1,26 +1,41 @@
-import { not, always, compose } from 'ramda'
+import { not, always, compose, modify } from 'ramda'
 import { Switch, Match } from 'solid-js'
 import { match, _ } from '../../utils/adt'
 import { modifyPath } from '../../utils/helpers'
 import { createReducer } from '../../utils/solid'
+import FocusMode, { FocussedState } from '../FocusMode'
 import { TaskItem } from './TaskItem'
 import TaskList from './TaskList'
 import { Action, UI } from './types'
 
 interface State {
   ui: UI
+  focussedState?: FocussedState
   tasks: TaskItem[]
   highlightedIndex: number
 }
 
 const init: State = {
-  ui: UI.List({ editing: false }),
-  tasks: [{ text: 'Something' }, { text: 'Cool' }, { text: 'Now' }],
+  ui: UI.Focus(),
+  focussedState: { index: 1 },
+  tasks: [
+    { text: 'Something' },
+    { text: 'This task is hip n fresh' },
+    { text: 'Now' },
+  ],
   highlightedIndex: 0,
 }
 
+const gotoFocus = (s: State) =>
+  s.focussedState ? modifyPath(['ui'] as const, always(UI.Focus()), s) : s
+
 const update = match<(s: State) => State, Action>({
-  SetUI: (ui) => (state) => ({ ...state, ui }),
+  GotoList: () => (state) => ({ ...state, ui: UI.List({ editing: false }) }),
+  GotoFocus: () => gotoFocus,
+  SwitchFocus: (index) =>
+    compose(gotoFocus, (s: State) =>
+      modifyPath(['focussedState', 'index'] as const, always(index), s)
+    ),
 
   SelectUp: () => (state) => ({
     ...state,
@@ -66,6 +81,39 @@ const update = match<(s: State) => State, Action>({
           )(state),
         _: () => state,
       })(state.ui),
+
+  Tick: () => (state) =>
+    match<State, UI>({
+      Focus: () =>
+        !state.focussedState?.running
+          ? state
+          : modifyPath(
+              ['focussedState', 'timeLeft'] as const,
+              (t: number) => (t ? t - 1 : 0),
+              state
+            ),
+      _: () => state,
+    })(state.ui),
+
+  StartTimer: (time) => (state) =>
+    match<State, UI>({
+      Focus: () =>
+        compose(
+          (state: State) =>
+            modifyPath(
+              ['focussedState', 'timeLeft'] as const,
+              always(time),
+              state
+            ),
+          (state: State) =>
+            modifyPath(
+              ['focussedState', 'running'] as const,
+              always(true),
+              state
+            )
+        )(state),
+      _: () => state,
+    })(state.ui),
 })
 
 export default function Tasks() {
@@ -82,8 +130,12 @@ export default function Tasks() {
             isEditing={state.ui.tag === 'List' && state.ui.value.editing}
           />
         </Match>
-        <Match when={state.ui.tag === 'Focus'}>
-          <div>{state.ui.tag === 'Focus' && state.ui.value.index}</div>
+        <Match when={state.ui.tag === 'Focus' && state.focussedState}>
+          <FocusMode
+            dispatch={dispatch}
+            focussedState={state.focussedState as any}
+            task={state.tasks[state.focussedState?.index ?? 0]}
+          />
         </Match>
       </Switch>
     </div>
