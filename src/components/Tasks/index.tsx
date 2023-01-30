@@ -33,14 +33,14 @@ const updateTask = ({
 const update = match<(s: State) => State, Action>({
   SetUI: (ui) => (state) => ({ ...state, ui }),
 
-  MoveUp: () => (state) => ({
+  SelectUp: () => (state) => ({
     ...state,
     highlightedIndex:
       state.highlightedIndex <= 0
         ? state.tasks.length - 1
         : state.highlightedIndex - 1,
   }),
-  MoveDown: () => (state) => ({
+  SelectDown: () => (state) => ({
     ...state,
     highlightedIndex:
       state.highlightedIndex >= state.tasks.length - 1
@@ -94,7 +94,7 @@ export default function Tasks() {
             dispatch={dispatch}
             highlightedIndex={state.highlightedIndex}
             tasks={state.tasks}
-            editing={state.ui.tag === 'List' && state.ui.value.editing}
+            isEditing={state.ui.tag === 'List' && state.ui.value.editing}
           />
         </Match>
         <Match when={state.ui.tag === 'Focus'}>

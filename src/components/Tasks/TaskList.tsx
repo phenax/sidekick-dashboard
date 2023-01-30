@@ -6,26 +6,18 @@ import { Action } from './types'
 interface Props {
   tasks: TaskItem[]
   highlightedIndex: number
-  editing: boolean
+  isEditing: boolean
   dispatch: Dispatch<Action>
 }
 
 export default function TaskList(props: Props) {
   createKeyboardHandler((ev) => {
-    if (props.editing) {
-      if (ev.ctrlKey)
-        return {
-          d: () => props.dispatch(Action.SetEditing(false)),
-        }
-
-      return
-    }
-
+    if (props.isEditing) return
+    ev.preventDefault()
     return {
       e: () => props.dispatch(Action.SetEditing(true)),
-      j: () => props.dispatch(Action.MoveDown()),
-      k: () => props.dispatch(Action.MoveUp()),
-      ' ': () => props.dispatch(Action.ToggleCheck(props.highlightedIndex)),
+      j: () => props.dispatch(Action.SelectDown()),
+      k: () => props.dispatch(Action.SelectUp()),
       _: () => {},
     }
   })
@@ -37,13 +29,14 @@ export default function TaskList(props: Props) {
           <Task
             task={task}
             isHighlighted={props.highlightedIndex === index()}
-            isEditing={props.highlightedIndex === index() && props.editing}
+            isEditing={props.highlightedIndex === index() && props.isEditing}
             submit={(value) => {
               props.dispatch(
                 Action.SetContents({ index: props.highlightedIndex, value })
               )
             }}
             toggle={() => props.dispatch(Action.ToggleCheck(index()))}
+            cancel={() => props.dispatch(Action.SetEditing(false))}
           />
         )}
       </For>

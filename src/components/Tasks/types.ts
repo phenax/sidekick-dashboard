@@ -3,8 +3,8 @@ import { constructors, Enum, _ } from '../../utils/adt'
 export type Action = Enum<{
   SetUI: UI
   ToggleCheck: number
-  MoveUp: _
-  MoveDown: _
+  SelectUp: _
+  SelectDown: _
   SetEditing: boolean
   SetContents: { index: number; value: string }
 }>
