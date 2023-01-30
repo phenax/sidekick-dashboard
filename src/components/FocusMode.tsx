@@ -18,6 +18,7 @@ interface Props {
 export default function FocusMode(props: Props) {
   createKeyboardHandler(() => {
     return {
+      h: () => props.dispatch(Action.GotoList()),
       Escape: () => props.dispatch(Action.GotoList()),
     }
   })
