@@ -1,5 +1,7 @@
+import { not, always, compose } from 'ramda'
 import { Switch, Match } from 'solid-js'
 import { match, _ } from '../../utils/adt'
+import { modifyPath } from '../../utils/helpers'
 import { createReducer } from '../../utils/solid'
 import { TaskItem } from './TaskItem'
 import TaskList from './TaskList'
@@ -16,19 +18,6 @@ const init: State = {
   tasks: [{ text: 'Something' }, { text: 'Cool' }, { text: 'Now' }],
   highlightedIndex: 0,
 }
-
-const updateTask = ({
-  state,
-  where,
-  fn,
-}: {
-  state: State
-  where: (t: TaskItem, i: number) => boolean
-  fn: (t: TaskItem, i: number) => TaskItem
-}) => ({
-  ...state,
-  tasks: state.tasks.map((t, i) => (where(t, i) ? fn(t, i) : t)),
-})
 
 const update = match<(s: State) => State, Action>({
   SetUI: (ui) => (state) => ({ ...state, ui }),
@@ -53,17 +42,14 @@ const update = match<(s: State) => State, Action>({
       List: (p) =>
         p.editing
           ? state
-          : updateTask({
-              state,
-              where: (_, i) => i === index,
-              fn: (t) => ({ ...t, checked: !t.checked }),
-            }),
+          : modifyPath(['tasks', index, 'checked'] as const, not, state),
       _: () => state,
     })(state.ui),
 
   SetEditing: (enable) => (state) =>
     match<State, UI>({
-      List: (p) => ({ ...state, ui: UI.List({ ...p, editing: enable }) }),
+      List: (_) =>
+        modifyPath(['ui', 'editing'] as const, always(enable), state),
       _: () => state,
     })(state.ui),
 
@@ -71,14 +57,13 @@ const update = match<(s: State) => State, Action>({
     ({ index, value }) =>
     (state) =>
       match<State, UI>({
-        List: (p) => ({
-          ...updateTask({
-            state,
-            where: (_, i) => i === index,
-            fn: (t) => ({ ...t, text: value }),
-          }),
-          ui: UI.List({ ...p, editing: false }),
-        }),
+        List: (_) =>
+          compose(
+            (s: State) =>
+              modifyPath(['tasks', index, 'text'] as const, always(value), s),
+            (s: State) =>
+              modifyPath(['ui', 'editing'] as const, always(false), s)
+          )(state),
         _: () => state,
       })(state.ui),
 })
