@@ -17,7 +17,14 @@ interface State {
 
 const init: State = {
   ui: UI.Focus(),
-  focussedState: { index: 1, state: TimerState.Focus({ timeLeft: 5 }) },
+  focussedState: {
+    index: 1,
+    state: TimerState.Focus({
+      startedAt: Date.now(),
+      duration: 5 * 1000,
+      timeLapsed: 0,
+    }),
+  },
   tasks: [
     { text: 'Something' },
     { text: 'This task is hip n fresh' },
@@ -29,17 +36,20 @@ const init: State = {
 const gotoFocus = (s: State) =>
   s.focussedState ? modifyPath(['ui'] as const, always(UI.Focus()), s) : s
 
-const nextTimerState = (state: State) =>
-  !state.focussedState?.state
+const nextTimerState = (state: State) => {
+  return !state.focussedState?.state
     ? state
     : match<State, TimerState>({
-        Focus: ({ timeLeft }) =>
+        Focus: (p) =>
           modifyPath(
             ['focussedState', 'state'] as const,
             () =>
-              timeLeft <= 0
-                ? TimerState.Overtime({ timeLapsed: 0 })
-                : TimerState.Focus({ timeLeft: timeLeft - 1 }),
+              Date.now() - p.startedAt >= p.duration
+                ? TimerState.Overtime({ startedAt: Date.now(), timeLapsed: 0 })
+                : TimerState.Focus({
+                    ...p,
+                    timeLapsed: Date.now() - p.startedAt,
+                  }),
             state
           ),
         _: () =>
@@ -49,6 +59,33 @@ const nextTimerState = (state: State) =>
             state
           ),
       })(state.focussedState.state)
+}
+
+const startFocus = (state: State) =>
+  modifyPath(
+    ['focussedState', 'state'] as const,
+    always(
+      TimerState.Focus({
+        startedAt: Date.now(),
+        duration: 30 * 60 * 1000,
+        timeLapsed: 0,
+      })
+    ),
+    state
+  )
+
+const startBreak = (state: State, minutes: number) =>
+  modifyPath(
+    ['focussedState', 'state'] as const,
+    always(
+      TimerState.Break({
+        startedAt: Date.now(),
+        duration: minutes * 60 * 1000,
+        timeLapsed: 0,
+      })
+    ),
+    state
+  )
 
 const update = match<(s: State) => State, Action>({
   GotoList: () => (state) => ({ ...state, ui: UI.List({ editing: false }) }),
@@ -58,12 +95,7 @@ const update = match<(s: State) => State, Action>({
       gotoFocus,
       (s: State) =>
         modifyPath(['focussedState', 'index'] as const, always(index), s),
-      (s: State) =>
-        modifyPath(
-          ['focussedState', 'state'] as const,
-          always(TimerState.Focus({ timeLeft: 30 * 60 })),
-          s
-        )
+      startFocus
     ),
 
   SelectUp: () => (state) => ({
@@ -116,6 +148,14 @@ const update = match<(s: State) => State, Action>({
       Focus: () => nextTimerState(state),
       _: () => state,
     })(state.ui),
+
+  TakeBreak: (minutes) => (state) =>
+    match<State, UI>({
+      Focus: () => startBreak(state, minutes),
+      _: () => state,
+    })(state.ui),
+
+  EndBreak: () => startFocus,
 })
 
 export default function Tasks() {

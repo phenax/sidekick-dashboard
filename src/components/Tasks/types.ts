@@ -1,9 +1,9 @@
 import { constructors, Enum, _ } from '../../utils/adt'
 
 export type TimerState = Enum<{
-  Focus: { timeLeft: number }
-  Break: { timeLapsed: number }
-  Overtime: { timeLapsed: number }
+  Focus: { startedAt: number; duration: number; timeLapsed: number }
+  Break: { startedAt: number; duration: number; timeLapsed: number }
+  Overtime: { startedAt: number; timeLapsed: number }
 }>
 export const TimerState = constructors<TimerState>()
 
@@ -17,6 +17,8 @@ export type Action = Enum<{
   GotoList: _
   SwitchFocus: number
   Tick: _
+  TakeBreak: number // minutes
+  EndBreak: _
 }>
 export const Action = constructors<Action>()
 

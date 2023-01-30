@@ -18,6 +18,8 @@ interface Props {
 export default function FocusMode(props: Props) {
   createKeyboardHandler(() => {
     return {
+      b: () => props.dispatch(Action.TakeBreak(10)),
+      r: () => props.dispatch(Action.EndBreak()),
       h: () => props.dispatch(Action.GotoList()),
       Escape: () => props.dispatch(Action.GotoList()),
     }
@@ -31,7 +33,7 @@ export default function FocusMode(props: Props) {
   const getTimeLeft = () => {
     if (!props.focussedState.state) return ''
     const timeLeft = match<number, TimerState>({
-      Focus: ({ timeLeft }) => timeLeft,
+      Focus: ({ duration, timeLapsed }) => (duration - timeLapsed) / 1000,
       Overtime: ({ timeLapsed }) => timeLapsed,
       Break: ({ timeLapsed }) => timeLapsed,
       _: () => 0,
@@ -40,6 +42,7 @@ export default function FocusMode(props: Props) {
     const totalMinutes = timeLeft / 60
     const minutes = Math.floor(totalMinutes)
     const seconds = Math.floor((totalMinutes - minutes) * 60)
+
     return `${minutes.toString().padStart(2, '0')}:${seconds
       .toString()
       .padStart(2, '0')}`
