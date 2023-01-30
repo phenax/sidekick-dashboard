@@ -1,12 +1,12 @@
 import { onCleanup } from 'solid-js'
+import { match } from '../utils/adt'
 import { createKeyboardHandler, Dispatch } from '../utils/solid'
 import { TaskItem } from './Tasks/TaskItem'
-import { Action } from './Tasks/types'
+import { Action, TimerState } from './Tasks/types'
 
 export interface FocussedState {
   index: number
-  timeLeft?: number
-  running?: false
+  state?: TimerState
 }
 
 interface Props {
@@ -29,7 +29,14 @@ export default function FocusMode(props: Props) {
   onCleanup(() => clearInterval(timer))
 
   const getTimeLeft = () => {
-    const timeLeft = props.focussedState.timeLeft ?? 0
+    if (!props.focussedState.state) return ''
+    const timeLeft = match<number, TimerState>({
+      Focus: ({ timeLeft }) => timeLeft,
+      Overtime: ({ timeLapsed }) => timeLapsed,
+      Break: ({ timeLapsed }) => timeLapsed,
+      _: () => 0,
+    })(props.focussedState.state)
+
     const totalMinutes = timeLeft / 60
     const minutes = Math.floor(totalMinutes)
     const seconds = Math.floor((totalMinutes - minutes) * 60)
@@ -39,15 +46,13 @@ export default function FocusMode(props: Props) {
   }
 
   return (
-    <div>
-      <h2 class="text-3xl bg-dark-900 my-5 py-5 text-center">
-        {props.task.text}
-      </h2>
+    <div class="text-center">
+      <div class="uppercase text-2xl py-2 text-gray-700">
+        {props.focussedState.state?.tag}
+      </div>
+      <h2 class="text-3xl bg-dark-900 mb-5 py-5">{props.task.text}</h2>
       <div class="flex items-center justify-center my-10">
-        <div
-          onClick={() => props.dispatch(Action.StartTimer(3 * 60 + 13))}
-          class="flex items-center justify-center w-96 h-96 border-8 border-purple rounded-full"
-        >
+        <div class="flex items-center justify-center w-96 h-96 border-8 border-purple rounded-full">
           <div class="text-8xl">{getTimeLeft()}</div>
         </div>
       </div>

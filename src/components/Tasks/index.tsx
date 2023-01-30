@@ -6,7 +6,7 @@ import { createReducer } from '../../utils/solid'
 import FocusMode, { FocussedState } from '../FocusMode'
 import { TaskItem } from './TaskItem'
 import TaskList from './TaskList'
-import { Action, UI } from './types'
+import { Action, TimerState, UI } from './types'
 
 interface State {
   ui: UI
@@ -17,7 +17,7 @@ interface State {
 
 const init: State = {
   ui: UI.Focus(),
-  focussedState: { index: 1 },
+  focussedState: { index: 1, state: TimerState.Focus({ timeLeft: 5 }) },
   tasks: [
     { text: 'Something' },
     { text: 'This task is hip n fresh' },
@@ -29,12 +29,41 @@ const init: State = {
 const gotoFocus = (s: State) =>
   s.focussedState ? modifyPath(['ui'] as const, always(UI.Focus()), s) : s
 
+const nextTimerState = (state: State) =>
+  !state.focussedState?.state
+    ? state
+    : match<State, TimerState>({
+        Focus: ({ timeLeft }) =>
+          modifyPath(
+            ['focussedState', 'state'] as const,
+            () =>
+              timeLeft <= 0
+                ? TimerState.Overtime({ timeLapsed: 0 })
+                : TimerState.Focus({ timeLeft: timeLeft - 1 }),
+            state
+          ),
+        _: () =>
+          modifyPath(
+            ['focussedState', 'state', 'value', 'timeLapsed'] as const,
+            (t: number) => (t ?? 0) + 1,
+            state
+          ),
+      })(state.focussedState.state)
+
 const update = match<(s: State) => State, Action>({
   GotoList: () => (state) => ({ ...state, ui: UI.List({ editing: false }) }),
   GotoFocus: () => gotoFocus,
   SwitchFocus: (index) =>
-    compose(gotoFocus, (s: State) =>
-      modifyPath(['focussedState', 'index'] as const, always(index), s)
+    compose(
+      gotoFocus,
+      (s: State) =>
+        modifyPath(['focussedState', 'index'] as const, always(index), s),
+      (s: State) =>
+        modifyPath(
+          ['focussedState', 'state'] as const,
+          always(TimerState.Focus({ timeLeft: 30 * 60 })),
+          s
+        )
     ),
 
   SelectUp: () => (state) => ({
@@ -84,34 +113,7 @@ const update = match<(s: State) => State, Action>({
 
   Tick: () => (state) =>
     match<State, UI>({
-      Focus: () =>
-        !state.focussedState?.running
-          ? state
-          : modifyPath(
-              ['focussedState', 'timeLeft'] as const,
-              (t: number) => (t ? t - 1 : 0),
-              state
-            ),
-      _: () => state,
-    })(state.ui),
-
-  StartTimer: (time) => (state) =>
-    match<State, UI>({
-      Focus: () =>
-        compose(
-          (state: State) =>
-            modifyPath(
-              ['focussedState', 'timeLeft'] as const,
-              always(time),
-              state
-            ),
-          (state: State) =>
-            modifyPath(
-              ['focussedState', 'running'] as const,
-              always(true),
-              state
-            )
-        )(state),
+      Focus: () => nextTimerState(state),
       _: () => state,
     })(state.ui),
 })

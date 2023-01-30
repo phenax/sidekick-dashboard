@@ -40,9 +40,7 @@ export default function TaskList(props: Props) {
             }}
             toggle={() => props.dispatch(Action.ToggleCheck(index()))}
             cancel={() => props.dispatch(Action.SetEditing(false))}
-            openInFocusMode={() =>
-              props.dispatch(Action.SwitchFocus(index()))
-            }
+            openInFocusMode={() => props.dispatch(Action.SwitchFocus(index()))}
           />
         )}
       </For>
