@@ -12,22 +12,27 @@ export type Effect<State, Action> = Enum<{
 }>
 export const Effect = constructors<Effect<any, any>>()
 
+export const runEffect = <S, A>(state: S, handleEffect: (e: () => Promise<A>) => void) => (eff: Effect<S, A>): S => 
+  match<S, Effect<S, A>>({
+    Pure: (state) => state,
+    Effectful: ({ state, effect }) => {
+      handleEffect(effect)
+      return state
+    },
+    Noop: () => state,
+  })(eff)
+
 export const createReducer = <State extends object, Action>(
   init: State,
   reducer: (_: Action) => (_: State) => Effect<State, Action>
 ): [State, Dispatch<Action>] => {
   const [state, setState] = createStore<State>(init)
   const dispatch: Dispatch<Action> = (action) => {
-    const computeNextState = compose(
-      match<void, Effect<State, Action>>({
-        Pure: (state) => setState(reconcile(state)),
-        Effectful: ({ state, effect }) => {
-          effect().then(dispatch)
-          setState(reconcile(state))
-        },
-        Noop: () => {},
-      }),
-      reducer(action)
+    const computeNextState: (s: State) => void = compose(
+      setState as any,
+      reconcile,
+      runEffect<State, Action>(state, (eff) => eff().then(dispatch)),
+      reducer(action),
     )
 
     computeNextState(state)

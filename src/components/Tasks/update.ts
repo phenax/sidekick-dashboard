@@ -11,27 +11,29 @@ const nextTimerState = (state: State) => {
   const updateTS = (fn: (_: TimerState) => TimerState): State =>
     modifyPath(['focussedState', 'state'] as const, fn, state)
 
-  return !state.focussedState?.state
-    ? state
-    : match<State, TimerState>({
-        Focus: (p) =>
-          updateTS(() =>
-            Date.now() - p.startedAt >= p.duration
-              ? TimerState.Overtime({ startedAt: Date.now(), timeLapsed: 0 })
-              : TimerState.Focus({
-                  ...p,
-                  timeLapsed: Date.now() - p.startedAt,
-                })
-          ),
-        Overtime: (p) =>
-          updateTS(() =>
-            TimerState.Overtime({ ...p, timeLapsed: Date.now() - p.startedAt })
-          ),
-        Break: (p) =>
-          updateTS(() =>
-            TimerState.Break({ ...p, timeLapsed: Date.now() - p.startedAt })
-          ),
-      })(state.focussedState.state)
+  if (!state.focussedState?.state) return state
+
+  return match<State, TimerState>({
+    Focus: (p) =>
+      updateTS(() =>
+        Date.now() - p.startedAt >= p.duration
+          ? TimerState.Overtime({ startedAt: Date.now(), timeLapsed: 0 })
+          : TimerState.Focus({
+              ...p,
+              timeLapsed: Date.now() - p.startedAt,
+            })
+      ),
+
+    Overtime: (p) =>
+      updateTS(() =>
+        TimerState.Overtime({ ...p, timeLapsed: Date.now() - p.startedAt })
+      ),
+
+    Break: (p) =>
+      updateTS(() =>
+        TimerState.Break({ ...p, timeLapsed: Date.now() - p.startedAt })
+      ),
+  })(state.focussedState.state)
 }
 
 const startFocus = (state: State) =>
@@ -63,17 +65,19 @@ const startBreak = (state: State, minutes: number) =>
 export const update = match<(s: State) => Effect<State, Action>, Action>({
   GotoList: () => (state) =>
     state.editing ? Effect.Noop() : Effect.Pure({ ...state, ui: UI.List() }),
-  GotoFocus: () => (state: State) => state.editing ? Effect.Noop() : Effect.Pure(gotoFocus(state)),
+  GotoFocus: () => (state: State) =>
+    state.editing ? Effect.Noop() : Effect.Pure(gotoFocus(state)),
   SwitchFocus: (index) => (state: State) =>
-    state.editing ? Effect.Noop() :
-    Effect.Pure(
-      compose(
-        gotoFocus,
-        (s: State) =>
-          modifyPath(['focussedState', 'index'] as const, always(index), s),
-        startFocus
-      )(state)
-    ),
+    state.editing
+      ? Effect.Noop()
+      : Effect.Pure(
+          compose(
+            gotoFocus,
+            (s: State) =>
+              modifyPath(['focussedState', 'index'] as const, always(index), s),
+            startFocus
+          )(state)
+        ),
 
   SelectUp: () => (state) =>
     Effect.Pure({
@@ -93,21 +97,30 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
           : state.highlightedIndex + 1,
     }),
 
-  AddTask: () => (state) => Effect.Pure(
-    match<State, UI>({
-      List: (_) =>
-        compose(
-          (s: State) => modifyPath(['editing'] as const, always(true), s),
-          (s: State) => modifyPath(['highlightedIndex'] as const, always(s.tasks.length - 1), s),
-          (s: State) => modify('tasks', t => [...t, { text: '' }], s),
-        )(state),
-      _: () => state,
-    })(state.ui)
-  ),
+  AddTask: () => (state) =>
+    Effect.Pure(
+      match<State, UI>({
+        List: (_) =>
+          compose(
+            (s: State) => modifyPath(['editing'] as const, always(true), s),
+            (s: State) =>
+              modifyPath(
+                ['highlightedIndex'] as const,
+                always(s.tasks.length - 1),
+                s
+              ),
+            (s: State) => modify('tasks', (t) => [...t, { text: '' }], s)
+          )(state),
+        _: () => state,
+      })(state.ui)
+    ),
 
   ToggleCheck: (index) => (state) =>
-    state.editing ? Effect.Noop() :
-    Effect.Pure(modifyPath(['tasks', index, 'checked'] as const, not, state)),
+    state.editing
+      ? Effect.Noop()
+      : Effect.Pure(
+          modifyPath(['tasks', index, 'checked'] as const, not, state)
+        ),
 
   SetEditing: (enable) => (state) =>
     Effect.Pure(modifyPath(['editing'] as const, always(enable), state)),
@@ -119,9 +132,8 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
         compose(
           (s: State) =>
             modifyPath(['tasks', index, 'text'] as const, always(value), s),
-          (s: State) =>
-            modifyPath(['editing'] as const, always(false), s)
-        )(state),
+          (s: State) => modifyPath(['editing'] as const, always(false), s)
+        )(state)
       ),
 
   Tick: () => (state) =>
@@ -142,4 +154,3 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
 
   EndBreak: () => (state: State) => Effect.Pure(startFocus(state)),
 })
-
