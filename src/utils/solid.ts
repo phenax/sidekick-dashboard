@@ -13,14 +13,13 @@ export const createReducer = <State extends object, Action>(
   const [state, setState] = createStore<State>(init)
   const dispatch: Dispatch<Action> = (action) => {
     const computeNextState = compose(
-      setState,
-      reconcile as any,
-      match<State, Effect<State, Action>>({
-        Pure: (state) => state,
+      match<void, Effect<State, Action>>({
+        Pure: (state) => setState(reconcile(state)),
         Effectful: ({ state, effect }) => {
           effect().then(dispatch)
-          return state
+          setState(reconcile(state))
         },
+        Noop: () => {},
       }),
       reducer(action)
     )
@@ -42,4 +41,9 @@ export const createKeyboardHandler = (
   }
   onMount(() => window.addEventListener('keypress', onKeyPress))
   onCleanup(() => window.addEventListener('keypress', onKeyPress))
+}
+
+export const createTimer = (interval: number, action: () => void) => {
+  const timer = setInterval(action, interval)
+  onCleanup(() => clearInterval(timer))
 }

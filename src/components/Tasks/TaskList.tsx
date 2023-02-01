@@ -17,6 +17,7 @@ export default function TaskList(props: Props) {
 
     ev.preventDefault()
     return {
+      a: () => props.dispatch(Action.AddTask()),
       e: () => props.dispatch(Action.SetEditing(true)),
       l: () => props.dispatch(Action.GotoFocus()),
       j: () => props.dispatch(Action.SelectDown()),

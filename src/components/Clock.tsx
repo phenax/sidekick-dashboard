@@ -1,12 +1,10 @@
-import { createMemo, createSignal, onCleanup } from 'solid-js'
+import { createMemo, createSignal } from 'solid-js'
+import { createTimer } from '../utils/solid'
 
 export default function Clock() {
   const [time, setTime] = createSignal(new Date())
 
-  const timer = setInterval(() => {
-    setTime(new Date())
-  }, 1000)
-  onCleanup(() => clearInterval(timer))
+  createTimer(500, () => setTime(new Date()))
 
   const formattedTime = createMemo(() => {
     const format = new Intl.DateTimeFormat('en-GB', {

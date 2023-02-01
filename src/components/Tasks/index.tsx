@@ -1,6 +1,6 @@
-import { not, always, compose } from 'ramda'
+import { not, always, compose, modify } from 'ramda'
 import { Switch, Match } from 'solid-js'
-import { match, _ } from '../../utils/adt'
+import { match } from '../../utils/adt'
 import { modifyPath } from '../../utils/helpers'
 import { createReducer } from '../../utils/solid'
 import FocusMode, { FocussedState } from '../FocusMode'
@@ -13,6 +13,7 @@ interface State {
   focussedState?: FocussedState
   tasks: TaskItem[]
   highlightedIndex: number
+  editing: boolean
 }
 
 const init: State = {
@@ -31,32 +32,35 @@ const init: State = {
     { text: 'Now' },
   ],
   highlightedIndex: 0,
+  editing: false
 }
 
 const gotoFocus = (s: State) =>
   s.focussedState ? modifyPath(['ui'] as const, always(UI.Focus()), s) : s
 
 const nextTimerState = (state: State) => {
+  const updateTS = (fn: (_: TimerState) => TimerState): State =>
+    modifyPath(['focussedState', 'state'] as const, fn, state)
+
   return !state.focussedState?.state
     ? state
     : match<State, TimerState>({
         Focus: (p) =>
-          modifyPath(
-            ['focussedState', 'state'] as const,
-            () =>
-              Date.now() - p.startedAt >= p.duration
-                ? TimerState.Overtime({ startedAt: Date.now(), timeLapsed: 0 })
-                : TimerState.Focus({
-                    ...p,
-                    timeLapsed: Date.now() - p.startedAt,
-                  }),
-            state
+          updateTS(() =>
+            Date.now() - p.startedAt >= p.duration
+              ? TimerState.Overtime({ startedAt: Date.now(), timeLapsed: 0 })
+              : TimerState.Focus({
+                  ...p,
+                  timeLapsed: Date.now() - p.startedAt,
+                })
           ),
-        _: () =>
-          modifyPath(
-            ['focussedState', 'state', 'value', 'timeLapsed'] as const,
-            (t: number) => (t ?? 0) + 1,
-            state
+        Overtime: (p) =>
+          updateTS(() =>
+            TimerState.Overtime({ ...p, timeLapsed: Date.now() - p.startedAt })
+          ),
+        Break: (p) =>
+          updateTS(() =>
+            TimerState.Break({ ...p, timeLapsed: Date.now() - p.startedAt })
           ),
       })(state.focussedState.state)
 }
@@ -89,9 +93,10 @@ const startBreak = (state: State, minutes: number) =>
 
 const update = match<(s: State) => Effect<State, Action>, Action>({
   GotoList: () => (state) =>
-    Effect.Pure({ ...state, ui: UI.List({ editing: false }) }),
-  GotoFocus: () => (state: State) => Effect.Pure(gotoFocus(state)),
+    state.editing ? Effect.Noop() : Effect.Pure({ ...state, ui: UI.List() }),
+  GotoFocus: () => (state: State) => state.editing ? Effect.Noop() : Effect.Pure(gotoFocus(state)),
   SwitchFocus: (index) => (state: State) =>
+    state.editing ? Effect.Noop() :
     Effect.Pure(
       compose(
         gotoFocus,
@@ -119,40 +124,35 @@ const update = match<(s: State) => Effect<State, Action>, Action>({
           : state.highlightedIndex + 1,
     }),
 
+  AddTask: () => (state) => Effect.Pure(
+    match<State, UI>({
+      List: (_) =>
+        compose(
+          (s: State) => modifyPath(['editing'] as const, always(true), s),
+          (s: State) => modifyPath(['highlightedIndex'] as const, always(s.tasks.length - 1), s),
+          (s: State) => modify('tasks', t => [...t, { text: '<>' }], s),
+        )(state),
+      _: () => state,
+    })(state.ui)
+  ),
+
   ToggleCheck: (index) => (state) =>
-    Effect.Pure(
-      match<State, UI>({
-        List: (p) =>
-          p.editing
-            ? state
-            : modifyPath(['tasks', index, 'checked'] as const, not, state),
-        _: () => state,
-      })(state.ui)
-    ),
+    state.editing ? Effect.Noop() :
+    Effect.Pure(modifyPath(['tasks', index, 'checked'] as const, not, state)),
 
   SetEditing: (enable) => (state) =>
-    Effect.Pure(
-      match<State, UI>({
-        List: (_) =>
-          modifyPath(['ui', 'editing'] as const, always(enable), state),
-        _: () => state,
-      })(state.ui)
-    ),
+    Effect.Pure(modifyPath(['editing'] as const, always(enable), state)),
 
   SetContents:
     ({ index, value }) =>
     (state) =>
       Effect.Pure(
-        match<State, UI>({
-          List: (_) =>
-            compose(
-              (s: State) =>
-                modifyPath(['tasks', index, 'text'] as const, always(value), s),
-              (s: State) =>
-                modifyPath(['ui', 'editing'] as const, always(false), s)
-            )(state),
-          _: () => state,
-        })(state.ui)
+        compose(
+          (s: State) =>
+            modifyPath(['tasks', index, 'text'] as const, always(value), s),
+          (s: State) =>
+            modifyPath(['editing'] as const, always(false), s)
+        )(state),
       ),
 
   Tick: () => (state) =>
@@ -185,7 +185,7 @@ export default function Tasks() {
             dispatch={dispatch}
             highlightedIndex={state.highlightedIndex}
             tasks={state.tasks}
-            isEditing={state.ui.tag === 'List' && state.ui.value.editing}
+            isEditing={state.editing}
           />
         </Match>
         <Match when={state.ui.tag === 'Focus' && state.focussedState}>

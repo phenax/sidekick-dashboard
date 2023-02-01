@@ -1,6 +1,5 @@
-import { onCleanup } from 'solid-js'
 import { match } from '../utils/adt'
-import { createKeyboardHandler, Dispatch } from '../utils/solid'
+import { createKeyboardHandler, createTimer, Dispatch } from '../utils/solid'
 import { TaskItem } from './Tasks/TaskItem'
 import { Action, TimerState } from './Tasks/types'
 
@@ -25,18 +24,14 @@ export default function FocusMode(props: Props) {
     }
   })
 
-  const timer = setInterval(() => {
-    props.dispatch(Action.Tick())
-  }, 1000)
-  onCleanup(() => clearInterval(timer))
+  createTimer(500, () => props.dispatch(Action.Tick()))
 
   const getTimeLeft = () => {
     if (!props.focussedState.state) return ''
     const timeLeft = match<number, TimerState>({
       Focus: ({ duration, timeLapsed }) => (duration - timeLapsed) / 1000,
-      Overtime: ({ timeLapsed }) => timeLapsed,
-      Break: ({ timeLapsed }) => timeLapsed,
-      _: () => 0,
+      Overtime: ({ timeLapsed }) => timeLapsed / 1000,
+      Break: ({ timeLapsed }) => timeLapsed / 1000,
     })(props.focussedState.state)
 
     const totalMinutes = timeLeft / 60
