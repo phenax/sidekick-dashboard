@@ -1,5 +1,23 @@
 import { constructors, Enum, _ } from '../../utils/adt'
 
+export interface TaskItem {
+  text: string
+  checked?: boolean
+}
+
+export interface FocussedState {
+  index: number
+  state?: TimerState
+}
+
+export interface State {
+  ui: UI
+  focussedState?: FocussedState
+  tasks: TaskItem[]
+  highlightedIndex: number
+  editing: boolean
+}
+
 export type TimerState = Enum<{
   Focus: { startedAt: number; duration: number; timeLapsed: number }
   Break: { startedAt: number; duration: number; timeLapsed: number }

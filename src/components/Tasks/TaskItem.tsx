@@ -1,10 +1,6 @@
 import { createSignal, Switch, Match, createEffect } from 'solid-js'
 import { createKeyboardHandler } from '../../utils/solid'
-
-export interface TaskItem {
-  text: string
-  checked?: boolean
-}
+import { TaskItem } from './types'
 
 interface TaskProps {
   task: TaskItem

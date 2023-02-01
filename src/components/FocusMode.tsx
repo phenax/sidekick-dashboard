@@ -1,12 +1,6 @@
 import { match } from '../utils/adt'
 import { createKeyboardHandler, createTimer, Dispatch } from '../utils/solid'
-import { TaskItem } from './Tasks/TaskItem'
-import { Action, TimerState } from './Tasks/types'
-
-export interface FocussedState {
-  index: number
-  state?: TimerState
-}
+import { Action, FocussedState, TaskItem, TimerState } from './Tasks/types'
 
 interface Props {
   task: TaskItem

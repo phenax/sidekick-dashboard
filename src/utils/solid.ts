@@ -1,4 +1,4 @@
-import { compose, pipe } from 'ramda'
+import { compose } from 'ramda'
 import { onCleanup, onMount } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { Effect } from '../components/Tasks/types'
