@@ -28,7 +28,14 @@ export default function TaskList(props: Props) {
 
   return (
     <div class="text-2xl mx-4">
-      <For each={props.tasks}>
+      <For
+        each={props.tasks}
+        fallback={() => (
+          <div class="text-2xl text-center py-16 w-full text-gray-500">
+            Are you seriously free right now?
+          </div>
+        )}
+      >
         {(task, index) => (
           <Task
             task={task}
