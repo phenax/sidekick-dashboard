@@ -1,10 +1,16 @@
 import { compose } from 'ramda'
 import { onCleanup, onMount } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
-import { Effect } from '../components/Tasks/types'
-import { match } from './adt'
+import { constructors, Enum, match, _ } from './adt'
 
 export type Dispatch<T> = (t: T) => void
+
+export type Effect<State, Action> = Enum<{
+  Pure: State
+  Effectful: { state: State; effect: () => Promise<Action> }
+  Noop: _
+}>
+export const Effect = constructors<Effect<any, any>>()
 
 export const createReducer = <State extends object, Action>(
   init: State,

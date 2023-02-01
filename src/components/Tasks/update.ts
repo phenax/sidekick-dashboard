@@ -1,7 +1,8 @@
 import { not, always, compose, modify } from 'ramda'
 import { match } from '../../utils/adt'
 import { modifyPath } from '../../utils/helpers'
-import { Action, Effect, State, TimerState, UI } from './types'
+import { Effect } from '../../utils/solid'
+import { Action, State, TimerState, UI } from './types'
 
 const gotoFocus = (s: State) =>
   s.focussedState ? modifyPath(['ui'] as const, always(UI.Focus()), s) : s

@@ -1,20 +1,20 @@
 import { Switch, Match } from 'solid-js'
-import { createReducer } from '../../utils/solid'
+import { createKeyboardHandler, createReducer } from '../../utils/solid'
 import FocusMode from '../FocusMode'
 import TaskList from './TaskList'
 import { State, TimerState, UI } from './types'
 import { update } from './update'
 
 const init: State = {
-  ui: UI.Focus(),
-  focussedState: {
-    index: 1,
-    state: TimerState.Focus({
-      startedAt: Date.now(),
-      duration: 5 * 1000,
-      timeLapsed: 0,
-    }),
-  },
+  ui: UI.List(),
+  // focussedState: {
+  //   index: 1,
+  //   state: TimerState.Focus({
+  //     startedAt: Date.now(),
+  //     duration: 5 * 1000,
+  //     timeLapsed: 0,
+  //   }),
+  // },
   tasks: [
     { text: 'Something' },
     { text: 'This task is hip n fresh' },
@@ -26,6 +26,12 @@ const init: State = {
 
 export default function Tasks() {
   const [state, dispatch] = createReducer(init, update)
+
+  createKeyboardHandler((ev) => {
+    if (ev.ctrlKey) return {
+      r: () => location.reload()
+    }
+  })
 
   return (
     <div>

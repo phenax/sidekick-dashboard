@@ -29,6 +29,20 @@ let
     webkitgtk
     libsoup
   ];
+
+  devShell = with pkgs; mkShell rec {
+    buildInputs = libDeps ++ [
+      nodePackages.pnpm
+      nodePackages.nodemon
+      nodePackages.typescript-language-server
+      rust-analyzer
+    ];
+    nativeBuildInputs = [ clang ];
+
+    LIBCLANG_PATH = "${libclang.lib}/lib";
+    LD_LIBRARY_PATH = lib.makeLibraryPath (buildInputs ++ nativeBuildInputs);
+    GIO_MODULE_DIR = "${glib-networking}/lib/gio/modules/";
+  };
 in
 rustPlatform.buildRustPackage rec {
   pname = "sidekick-dashboard";
@@ -51,6 +65,6 @@ rustPlatform.buildRustPackage rec {
 
   passthru = {
     rust = rust;
-    libDeps = libDeps;
+    devShell = devShell;
   };
 }

@@ -13,7 +13,7 @@ interface Props {
 export default function TaskList(props: Props) {
   createKeyboardHandler((ev) => {
     if (props.isEditing) return
-    if (ev.ctrlKey && ev.key === 'r') location.reload()
+    if (ev.ctrlKey) return
 
     ev.preventDefault()
     return {

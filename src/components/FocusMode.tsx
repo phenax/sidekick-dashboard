@@ -9,7 +9,8 @@ interface Props {
 }
 
 export default function FocusMode(props: Props) {
-  createKeyboardHandler(() => {
+  createKeyboardHandler((ev) => {
+    if (ev.ctrlKey) return
     return {
       b: () => props.dispatch(Action.TakeBreak(10)),
       r: () => props.dispatch(Action.EndBreak()),
@@ -32,9 +33,8 @@ export default function FocusMode(props: Props) {
     const minutes = Math.floor(totalMinutes)
     const seconds = Math.floor((totalMinutes - minutes) * 60)
 
-    return `${minutes.toString().padStart(2, '0')}:${seconds
-      .toString()
-      .padStart(2, '0')}`
+    const pad = (n: number) => n.toFixed(0).padStart(2, '0')
+    return `${pad(minutes)}:${pad(seconds)}`
   }
 
   return (
