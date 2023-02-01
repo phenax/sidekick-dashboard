@@ -21,16 +21,17 @@ const init: State = {
     { text: 'Now' },
   ],
   highlightedIndex: 0,
-  editing: false
+  editing: false,
 }
 
 export default function Tasks() {
   const [state, dispatch] = createReducer(init, update)
 
   createKeyboardHandler((ev) => {
-    if (ev.ctrlKey) return {
-      r: () => location.reload()
-    }
+    if (ev.ctrlKey)
+      return {
+        r: () => location.reload(),
+      }
   })
 
   return (

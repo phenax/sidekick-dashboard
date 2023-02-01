@@ -1,6 +1,6 @@
-import { runEffect } from "../../utils/solid"
-import { Action, State, UI } from "./types"
-import { update } from "./update"
+import { runEffect } from '../../utils/solid'
+import { Action, State, UI } from './types'
+import { update } from './update'
 
 describe('update', () => {
   it('should perform basic task list actions', () => {
@@ -12,7 +12,7 @@ describe('update', () => {
         { text: 'Lick self' },
       ],
       highlightedIndex: 1,
-      editing: false
+      editing: false,
     }
 
     const noop = () => {}
@@ -20,7 +20,8 @@ describe('update', () => {
     const nextState = (a: Action, s: State = state): State =>
       runEffect(s, noop)(update(a)(s))
 
-    const chainActions = (a: Action[]): State => a.reduce((st, a) => nextState(a, st), state)
+    const chainActions = (a: Action[]): State =>
+      a.reduce((st, a) => nextState(a, st), state)
 
     expect(nextState(Action.SetEditing(true))).toEqual({
       ...state,
@@ -36,7 +37,9 @@ describe('update', () => {
       editing: true,
       tasks: [...state.tasks, { text: '' }],
     })
-    expect(nextState(Action.SetContents({ index: 0, value: 'Foobar' }))).toEqual({
+    expect(
+      nextState(Action.SetContents({ index: 0, value: 'Foobar' }))
+    ).toEqual({
       ...state,
       tasks: [{ text: 'Foobar' }, ...state.tasks.slice(1)],
     })
@@ -44,7 +47,9 @@ describe('update', () => {
       ...state,
       tasks: [{ text: 'Buy milk', checked: true }, ...state.tasks.slice(1)],
     })
-    expect(chainActions([ Action.ToggleCheck(0), Action.ToggleCheck(0) ])).toEqual({
+    expect(
+      chainActions([Action.ToggleCheck(0), Action.ToggleCheck(0)])
+    ).toEqual({
       ...state,
       tasks: [{ text: 'Buy milk', checked: false }, ...state.tasks.slice(1)],
     })
