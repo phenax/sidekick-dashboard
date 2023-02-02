@@ -2,7 +2,7 @@ import { Switch, Match } from 'solid-js'
 import { createKeyboardHandler, createReducer } from '../../utils/solid'
 import FocusMode from '../FocusMode'
 import TaskList from './TaskList'
-import { State, TimerState, UI } from './types'
+import { Action, State, UI } from './types'
 import { update } from './update'
 
 const init: State = {
@@ -28,10 +28,11 @@ export default function Tasks() {
   const [state, dispatch] = createReducer(init, update)
 
   createKeyboardHandler((ev) => {
-    if (ev.ctrlKey)
+    if (ev.ctrlKey) {
       return {
-        r: () => location.reload(),
+        r: () => dispatch(Action.Refresh()),
       }
+    }
   })
 
   return (

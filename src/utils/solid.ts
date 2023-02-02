@@ -53,7 +53,7 @@ export const createKeyboardHandler = (
       match({ _: () => {}, ...(p as any) })({ tag: ev.key, value: undefined })
   }
   onMount(() => window.addEventListener('keypress', onKeyPress))
-  onCleanup(() => window.addEventListener('keypress', onKeyPress))
+  onCleanup(() => window.removeEventListener('keypress', onKeyPress))
 }
 
 export const createTimer = (interval: number, action: () => void) => {

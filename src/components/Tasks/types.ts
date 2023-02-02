@@ -27,6 +27,7 @@ export const TimerState = constructors<TimerState>()
 
 export type Action = Enum<{
   AddTask: _
+  DeleteTask: number
   ToggleCheck: number
   SelectUp: _
   SelectDown: _
@@ -38,6 +39,7 @@ export type Action = Enum<{
   Tick: _
   TakeBreak: number // minutes
   EndBreak: _
+  Refresh: _
 }>
 export const Action = constructors<Action>()
 
