@@ -118,12 +118,13 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
       })(state.ui)
     ),
 
-  DeleteTask: index => state => Effect.Pure(
-    compose(
-      modify('highlightedIndex', clamp(0, state.tasks.length - 2)),
-      modify('tasks', remove(index, 1)),
-    )(state)
-  ),
+  DeleteTask: (index) => (state) =>
+    Effect.Pure(
+      compose(
+        modify('highlightedIndex', clamp(0, state.tasks.length - 2)),
+        modify('tasks', remove(index, 1))
+      )(state)
+    ),
 
   ToggleCheck: (index) => (state) =>
     state.editing
@@ -164,8 +165,9 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
 
   EndBreak: () => (state: State) => Effect.Pure(startFocus(state)),
 
-  Refresh: () => (state) => Effect.Effectful({
-    state,
-    effect: async () => location.reload(),
-  })
+  Refresh: () => (state) =>
+    Effect.Effectful({
+      state,
+      effect: async () => location.reload(),
+    }),
 })

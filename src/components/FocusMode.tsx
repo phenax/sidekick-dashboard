@@ -49,15 +49,14 @@ export default function FocusMode(props: Props) {
     }
   })
 
-  const getHighlightClass = () =>
-    !props.focussedState?.state
-      ? ''
-      : match<string, TimerState>({
-          Focus: () => 'bg-dark-900',
-          Break: (b) =>
-            b.duration <= b.timeLapsed ? 'bg-red-700' : 'bg-purple',
-          Overtime: () => 'bg-white text-dark-700',
-        })(props.focussedState?.state)
+  const getHighlightClass = () => {
+    if (!props.focussedState?.state) return ''
+    return match<string, TimerState>({
+      Focus: () => 'bg-dark-900',
+      Break: (b) => (b.duration <= b.timeLapsed ? 'bg-red-700' : 'bg-purple'),
+      Overtime: () => 'bg-white text-dark-700',
+    })(props.focussedState?.state)
+  }
 
   return (
     <div class="text-center">
