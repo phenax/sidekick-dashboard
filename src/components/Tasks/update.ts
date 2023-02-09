@@ -4,6 +4,9 @@ import { modifyPath } from '../../utils/helpers'
 import { Effect } from '../../utils/solid'
 import { Action, State, TimerState, UI } from './types'
 
+export const FOCUS_DURATION = 30
+export const BREAK_DURATION = 10
+
 const gotoFocus = (s: State) =>
   s.focussedState ? modifyPath(['ui'] as const, always(UI.Focus()), s) : s
 
@@ -42,7 +45,7 @@ const startFocus = (state: State) =>
     always(
       TimerState.Focus({
         startedAt: Date.now(),
-        duration: 30 * 60 * 1000,
+        duration: FOCUS_DURATION * 60 * 1000,
         timeLapsed: 0,
       })
     ),
