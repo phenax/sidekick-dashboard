@@ -1,5 +1,5 @@
-import { Switch, Match, onMount } from 'solid-js'
-import { createKeyboardHandler, createReducer, createTimer } from '../../utils/solid'
+import { Switch, Match, onMount, createEffect } from 'solid-js'
+import { createKeyboardHandler, createReducer } from '../../utils/solid'
 import FocusMode from '../FocusMode'
 import TaskList from './TaskList'
 import { Action, State, UI } from './types'
@@ -27,9 +27,9 @@ export default function Tasks() {
     dispatch(Action.LoadTasks())
   })
 
-  createTimer(10000, () => {
+  createEffect(() => {
     dispatch(Action.SyncTasks())
-  })
+  }, state.tasks)
 
   return (
     <div>
