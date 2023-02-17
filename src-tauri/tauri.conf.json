@@ -62,7 +62,9 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "sidekick-dashboard",
+        "title": "Sidekick Dashboard",
+        "decorations": false,
+        "theme": "Dark",
         "width": 800
       }
     ]

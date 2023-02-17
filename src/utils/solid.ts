@@ -33,7 +33,7 @@ export const createReducer = <State extends object, Action>(
     const computeNextState: (s: State) => void = compose(
       setState as any,
       reconcile,
-      runEffect<State, Action>(state, (eff) => eff().then(dispatch)),
+      runEffect<State, Action>(state, (eff) => eff().then(e => e && dispatch(e))),
       reducer(action)
     )
 

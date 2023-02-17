@@ -1,5 +1,5 @@
-import { Switch, Match } from 'solid-js'
-import { createKeyboardHandler, createReducer } from '../../utils/solid'
+import { Switch, Match, onMount } from 'solid-js'
+import { createKeyboardHandler, createReducer, createTimer } from '../../utils/solid'
 import FocusMode from '../FocusMode'
 import TaskList from './TaskList'
 import { Action, State, UI } from './types'
@@ -7,19 +7,7 @@ import { update } from './update'
 
 const init: State = {
   ui: UI.List(),
-  // focussedState: {
-  //   index: 1,
-  //   state: TimerState.Focus({
-  //     startedAt: Date.now(),
-  //     duration: 5 * 1000,
-  //     timeLapsed: 0,
-  //   }),
-  // },
-  tasks: [
-    { text: 'Something' },
-    { text: 'This task is hip n fresh' },
-    { text: 'Now' },
-  ],
+  tasks: [],
   highlightedIndex: 0,
   editing: false,
 }
@@ -33,6 +21,14 @@ export default function Tasks() {
         r: () => dispatch(Action.Refresh()),
       }
     }
+  })
+
+  onMount(() => {
+    dispatch(Action.LoadTasks())
+  })
+
+  createTimer(10000, () => {
+    dispatch(Action.SyncTasks())
   })
 
   return (

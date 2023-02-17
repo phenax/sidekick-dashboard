@@ -40,6 +40,10 @@ export type Action = Enum<{
   TakeBreak: number // minutes
   EndBreak: _
   Refresh: _
+  LoadTasks: _
+  LoadTasksSuccess: TaskItem[]
+  LoadTasksFailure: string
+  SyncTasks: _
 }>
 export const Action = constructors<Action>()
 

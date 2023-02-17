@@ -28,6 +28,11 @@ let
     gtk3
     webkitgtk
     libsoup
+    dbus
+    cairo
+    openssl_3
+    glib
+    appimagekit
   ];
 
   devShell = with pkgs; mkShell rec {
@@ -39,9 +44,7 @@ let
     ];
     nativeBuildInputs = [ clang ];
 
-    LIBCLANG_PATH = "${libclang.lib}/lib";
     LD_LIBRARY_PATH = lib.makeLibraryPath (buildInputs ++ nativeBuildInputs);
-    GIO_MODULE_DIR = "${glib-networking}/lib/gio/modules/";
   };
 in
 rustPlatform.buildRustPackage rec {
@@ -60,7 +63,7 @@ rustPlatform.buildRustPackage rec {
 
   cargoSha256 = lib.fakeSha256; # "sha256-dgW2SlpKovw79wkdGcbVm6c8KqkbcZlvZCwCcdVBShw=";
 
-  nativeBuildInputs = with pkgs; [ cmake wrapQtAppsHook clang ];
+  nativeBuildInputs = with pkgs; [ cmake clang ];
   buildInputs = libDeps;
 
   passthru = {

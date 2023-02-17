@@ -3,15 +3,38 @@
   windows_subsystem = "windows"
 )]
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+struct TaskItem {
+  text: String,
+  checked: bool,
+}
+
 #[tauri::command]
-fn greet(name: &str) -> String {
-  format!("Hello, {}! You've been greeted from Rust!", name)
+fn load_tasks() -> Vec<TaskItem> {
+  vec![
+    TaskItem {
+      text: "foobar".to_string(),
+      checked: false,
+    },
+    TaskItem {
+      text: "Nicetyt".to_string(),
+      checked: true,
+    },
+    TaskItem {
+      text: "Gogo gadget".to_string(),
+      checked: false,
+    },
+  ]
+}
+
+#[tauri::command]
+fn sync_tasks(tasks: Vec<TaskItem>) -> () {
+  println!("Syncingg : {:?}", tasks);
 }
 
 fn main() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![greet])
+    .invoke_handler(tauri::generate_handler![load_tasks, sync_tasks])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }

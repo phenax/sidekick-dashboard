@@ -1,3 +1,4 @@
+import { invoke } from '@tauri-apps/api'
 import { not, always, compose, modify, remove, clamp } from 'ramda'
 import { match } from '../../utils/adt'
 import { modifyPath } from '../../utils/helpers'
@@ -66,6 +67,17 @@ const startBreak = (state: State, minutes: number) =>
   )
 
 export const update = match<(s: State) => Effect<State, Action>, Action>({
+  LoadTasks: () => (state) =>
+    Effect.Effectful({
+      state,
+      effect: () => invoke('load_tasks', {})
+        .then(d => Action.LoadTasksSuccess(d as any))
+        .catch((e: any) => Action.LoadTasksFailure(e.message)),
+    }),
+  LoadTasksSuccess: tasks => (state) => Effect.Pure({ ...state, tasks }),
+  LoadTasksFailure: error => (state) => Effect.Effectful({ state, effect: async () => alert(error) }),
+  SyncTasks: () => state => Effect.Effectful({ state, effect: () => invoke('sync_tasks', { tasks: state.tasks }) }),
+
   GotoList: () => (state) =>
     state.editing ? Effect.Noop() : Effect.Pure({ ...state, ui: UI.List() }),
   GotoFocus: () => (state: State) =>
