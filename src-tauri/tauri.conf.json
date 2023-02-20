@@ -3,7 +3,7 @@
     "beforeDevCommand": "pnpm dev",
     "beforeBuildCommand": "pnpm build",
     "devPath": "http://localhost:1420",
-    "distDir": "../dist",
+    "distDir": "./frontend-dist",
     "withGlobalTauri": false
   },
   "package": {
@@ -33,7 +33,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "dev.ediblemonad.sidekick",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

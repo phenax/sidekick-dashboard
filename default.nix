@@ -1,11 +1,7 @@
-{ stdenv, pkgs, rustPlatform, lib }:
-with pkgs.lib;
+{ pkgs ? import <nixpkgs> { } }:
+with pkgs;
 
 let
-  useFakeHash = true;
-  commitHash = "f160ec9742cacd14f8853ea6d17dc4011f85156d";
-  realSha256 = "sha256-LCFcX23dY7tFoXPgEHaD+U6g2X/9M4aE4TPfvhu6bLI=";
-
   src = pkgs.fetchFromGitHub {
     owner = "mozilla";
     repo = "nixpkgs-mozilla";
@@ -16,6 +12,9 @@ let
   rust = moz.latest.rustChannels.nightly.rust.override {
     extensions = [ "rust-src" ];
   };
+
+  nodejs = nodejs-18_x;
+  nodePkgs = import ./nix/default.nix { inherit nodejs; };
 
   libDeps = with pkgs; [
     rust
@@ -33,12 +32,14 @@ let
     openssl_3
     glib
     appimagekit
+    nodejs
   ];
 
   devShell = with pkgs; mkShell rec {
     buildInputs = libDeps ++ [
       nodePackages.pnpm
       nodePackages.nodemon
+      nodePackages.typescript
       nodePackages.typescript-language-server
       rust-analyzer
     ];
@@ -51,20 +52,20 @@ rustPlatform.buildRustPackage rec {
   pname = "sidekick-dashboard";
   version = "0.0.0";
 
-  src = pkgs.fetchFromGitHub {
-    owner = "phenax";
-    repo = "sidekick-dashboard";
-    rev = "main"; # commitHash;
-    sha256 =
-      if useFakeHash
-      then lib.fakeSha256
-      else realSha256;
-  };
+  src = ./src-tauri;
 
-  cargoSha256 = lib.fakeSha256; # "sha256-dgW2SlpKovw79wkdGcbVm6c8KqkbcZlvZCwCcdVBShw=";
+  cargoSha256 = "sha256-La+5eHdud1zSgXGugHHPKVH1GXdeeeOhzXuzVOHxK+w=";
 
-  nativeBuildInputs = with pkgs; [ cmake clang ];
-  buildInputs = libDeps;
+  nativeBuildInputs = with pkgs; [ cmake clang pkg-config ];
+  buildInputs = libDeps ++ [ nodePkgs.nodeDependencies ];
+
+  shellHook = ''
+    export NODE_PATH=${nodePkgs.nodeDependencies}/lib/node_modules;
+  '';
+
+  preBuildHook = ''
+    echo "foobarity ----------------------"
+  '';
 
   passthru = {
     rust = rust;
