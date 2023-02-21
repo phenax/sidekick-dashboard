@@ -30,7 +30,7 @@ export default function Clock() {
       class="text-center bg-dark-900 font-primarybold"
       style={{ padding: '4rem 0' }}
     >
-      <h1 class="text-9xl">{formattedTime}</h1>
+      <h1 style={{ 'font-size': '7rem', 'line-height': '1em' }}>{formattedTime}</h1>
       <div class="text-3xl">{formattedDate}</div>
     </div>
   )
