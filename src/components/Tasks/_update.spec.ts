@@ -6,11 +6,12 @@ describe('update', () => {
   it('should perform basic task list actions', () => {
     const state: State = {
       ui: UI.List(),
-      tasks: [
-        { text: 'Buy milk' },
-        { text: 'Pour milk on self' },
-        { text: 'Lick self' },
-      ],
+      tasks: {
+        '1': { id: '1', text: 'Buy milk' },
+        '2': { id: '2', text: 'Pour milk on self' },
+        '3': { id: '3', text: 'Lick self' },
+      },
+      taskOrder: ['1', '2', '3'],
       highlightedIndex: 1,
       editing: false,
     }
@@ -35,23 +36,23 @@ describe('update', () => {
       ...state,
       highlightedIndex: 3,
       editing: true,
-      tasks: [...state.tasks, { text: '' }],
+      tasks: {...state.tasks, '6': { id: '6', text: '' }},
     })
     expect(
-      nextState(Action.SetContents({ index: 0, value: 'Foobar' }))
+      nextState(Action.SetContents({ id: '2', value: 'Foobar' }))
     ).toEqual({
       ...state,
-      tasks: [{ text: 'Foobar' }, ...state.tasks.slice(1)],
+      tasks: {...state.tasks, '2': { id: '2', text: 'Foobar' }},
     })
-    expect(nextState(Action.ToggleCheck(0))).toEqual({
+    expect(nextState(Action.ToggleCheck('1'))).toEqual({
       ...state,
-      tasks: [{ text: 'Buy milk', checked: true }, ...state.tasks.slice(1)],
+      tasks: { ...state.tasks, '1': { id: '1', text: 'Buy milk', checked: true }},
     })
     expect(
-      chainActions([Action.ToggleCheck(0), Action.ToggleCheck(0)])
+      chainActions([Action.ToggleCheck('2'), Action.ToggleCheck('2')])
     ).toEqual({
       ...state,
-      tasks: [{ text: 'Buy milk', checked: false }, ...state.tasks.slice(1)],
+      tasks: { ...state.tasks, '2': { id: '2', text: 'Buy milk', checked: false }},
     })
   })
 })

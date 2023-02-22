@@ -15,15 +15,21 @@ export default function TaskList(props: Props) {
     if (props.isEditing) return
     if (ev.ctrlKey) return
 
+    const currentId = props.tasks[props.highlightedIndex].id
+
     ev.preventDefault()
     return {
       a: () => props.dispatch(Action.AddTask()),
       r: () => props.dispatch(Action.LoadTasks()),
-      d: () => props.dispatch(Action.DeleteTask(props.highlightedIndex)),
+      d: () => props.dispatch(Action.DeleteTask(currentId)),
       e: () => props.dispatch(Action.SetEditing(true)),
       l: () => props.dispatch(Action.GotoFocus()),
+
       j: () => props.dispatch(Action.SelectDown()),
       k: () => props.dispatch(Action.SelectUp()),
+
+      J: () => props.dispatch(Action.MoveDown()),
+      K: () => props.dispatch(Action.MoveUp()),
       _: () => {},
     }
   })
@@ -45,12 +51,12 @@ export default function TaskList(props: Props) {
             isEditing={props.highlightedIndex === index() && props.isEditing}
             submit={(value) => {
               props.dispatch(
-                Action.SetContents({ index: props.highlightedIndex, value })
+                Action.SetContents({ id: props.tasks[props.highlightedIndex].id, value })
               )
             }}
-            toggle={() => props.dispatch(Action.ToggleCheck(index()))}
+            toggle={() => props.dispatch(Action.ToggleCheck(props.tasks[index()].id))}
             cancel={() => props.dispatch(Action.SetEditing(false))}
-            openInFocusMode={() => props.dispatch(Action.SwitchFocus(index()))}
+            openInFocusMode={() => props.dispatch(Action.SwitchFocus(props.tasks[index()].id))}
           />
         )}
       </For>

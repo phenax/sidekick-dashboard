@@ -7,7 +7,8 @@ import { update } from './update'
 
 const init: State = {
   ui: UI.List(),
-  tasks: [],
+  tasks: {},
+  taskOrder: [],
   highlightedIndex: 0,
   editing: false,
 }
@@ -38,7 +39,7 @@ export default function Tasks() {
           <TaskList
             dispatch={dispatch}
             highlightedIndex={state.highlightedIndex}
-            tasks={state.tasks}
+            tasks={state.taskOrder.map(tid => state.tasks[tid])}
             isEditing={state.editing}
           />
         </Match>

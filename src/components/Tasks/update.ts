@@ -1,12 +1,15 @@
 import { invoke } from '@tauri-apps/api'
-import { not, always, compose, modify, remove, clamp } from 'ramda'
+import { not, always, compose, modify, clamp, dissoc, filter } from 'ramda'
 import { match } from '../../utils/adt'
 import { modifyPath } from '../../utils/helpers'
 import { Effect } from '../../utils/solid'
-import { Action, State, TimerState, UI } from './types'
+import { Action, State, TaskId, TaskItem, TimerState, UI } from './types'
 
 export const FOCUS_DURATION = 30
 export const BREAK_DURATION = 10
+
+const uuid = () =>
+  `${Math.random()}${Math.random()}`.slice(2, 18).padEnd(16, '0')
 
 const gotoFocus = (s: State) =>
   s.focussedState ? modifyPath(['ui'] as const, always(UI.Focus()), s) : s
@@ -66,17 +69,55 @@ const startBreak = (state: State, minutes: number) =>
     state
   )
 
+const nextIndex = (state: State) =>
+  state.highlightedIndex >= state.taskOrder.length - 1
+    ? 0
+    : state.highlightedIndex + 1
+
+const prevIndex = (state: State) =>
+  state.highlightedIndex <= 0
+    ? state.taskOrder.length - 1
+    : state.highlightedIndex - 1
+
+const swapTasks = (targetIndex: number, state: State) => {
+  const tasks = [...state.taskOrder]
+  const current = tasks[state.highlightedIndex]
+  tasks[state.highlightedIndex] = tasks[targetIndex]
+  tasks[targetIndex] = current
+  return {
+    ...state,
+    taskOrder: tasks,
+    highlightedIndex: targetIndex,
+  }
+}
+
 export const update = match<(s: State) => Effect<State, Action>, Action>({
   LoadTasks: () => (state) =>
     Effect.Effectful({
       state,
-      effect: () => invoke('load_tasks', {})
-        .then(d => Action.LoadTasksSuccess(d as any))
-        .catch((e: any) => Action.LoadTasksFailure(e.message)),
+      effect: () =>
+        invoke('load_tasks', {})
+          .then((d) => Action.LoadTasksSuccess(d as any))
+          .catch((e: any) => Action.LoadTasksFailure(e.message)),
     }),
-  LoadTasksSuccess: tasks => (state) => Effect.Pure({ ...state, tasks }),
-  LoadTasksFailure: error => (state) => Effect.Effectful({ state, effect: async () => alert(error) }),
-  SyncTasks: () => state => Effect.Effectful({ state, effect: () => invoke('sync_tasks', { tasks: state.tasks }) }),
+  LoadTasksSuccess: (taskItems) => (state) => {
+    const tasks = taskItems.map((t) => ({ ...t, id: uuid() }))
+    return Effect.Pure({
+      ...state,
+      tasks: Object.fromEntries(tasks.map((t) => [t.id, t])),
+      taskOrder: tasks.map((t) => t.id),
+    })
+  },
+  LoadTasksFailure: (error) => (state) =>
+    Effect.Effectful({ state, effect: async () => alert(error) }),
+  SyncTasks: () => (state) =>
+    Effect.Effectful({
+      state,
+      effect: () =>
+        invoke('sync_tasks', {
+          tasks: state.taskOrder.map((tid) => state.tasks[tid]),
+        }),
+    }),
 
   GotoList: () => (state) =>
     state.editing ? Effect.Noop() : Effect.Pure({ ...state, ui: UI.List() }),
@@ -95,22 +136,12 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
         ),
 
   SelectUp: () => (state) =>
-    Effect.Pure({
-      ...state,
-      highlightedIndex:
-        state.highlightedIndex <= 0
-          ? state.tasks.length - 1
-          : state.highlightedIndex - 1,
-    }),
-
+    Effect.Pure({ ...state, highlightedIndex: prevIndex(state) }),
   SelectDown: () => (state) =>
-    Effect.Pure({
-      ...state,
-      highlightedIndex:
-        state.highlightedIndex >= state.tasks.length - 1
-          ? 0
-          : state.highlightedIndex + 1,
-    }),
+    Effect.Pure({ ...state, highlightedIndex: nextIndex(state) }),
+
+  MoveUp: () => (state) => Effect.Pure(swapTasks(prevIndex(state), state)),
+  MoveDown: () => (state) => Effect.Pure(swapTasks(nextIndex(state), state)),
 
   AddTask: () => (state) =>
     Effect.Pure(
@@ -121,20 +152,32 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
             (s: State) =>
               modifyPath(
                 ['highlightedIndex'] as const,
-                always(s.tasks.length - 1),
+                always(s.taskOrder.length - 1),
                 s
               ),
-            (s: State) => modify('tasks', (t) => [...t, { text: '' }], s)
+            (s: State) => {
+              const tid = uuid()
+              return compose(
+                modify('tasks', (t: Record<TaskId, TaskItem>) => ({
+                  ...t,
+                  [tid]: { id: tid, text: '' },
+                })),
+                modify('taskOrder', (t: TaskId[]) => [...t, tid])
+              )(s) as State
+            }
           )(state),
         _: () => state,
       })(state.ui)
     ),
 
-  DeleteTask: (index) => (state) =>
+  DeleteTask: (taskId) => (state) =>
     Effect.Pure(
       compose(
-        modify('highlightedIndex', clamp(0, state.tasks.length - 2)),
-        modify('tasks', remove(index, 1))
+        modify('highlightedIndex', clamp(0, state.taskOrder.length - 2)),
+        modify('tasks', dissoc(taskId) as any) as (s: State) => State,
+        modify('taskOrder', filter((t) => t !== taskId) as any) as (
+          s: State
+        ) => State
       )(state)
     ),
 
@@ -149,12 +192,12 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
     Effect.Pure(modifyPath(['editing'] as const, always(enable), state)),
 
   SetContents:
-    ({ index, value }) =>
+    ({ id, value }) =>
     (state) =>
       Effect.Pure(
         compose(
           (s: State) =>
-            modifyPath(['tasks', index, 'text'] as const, always(value), s),
+            modifyPath(['tasks', id, 'text'] as const, always(value), s),
           (s: State) => modifyPath(['editing'] as const, always(false), s)
         )(state)
       ),

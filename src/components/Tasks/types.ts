@@ -1,6 +1,7 @@
 import { constructors, Enum, _ } from '../../utils/adt'
 
 export interface TaskItem {
+  id: TaskId
   text: string
   checked?: boolean
 }
@@ -10,10 +11,13 @@ export interface FocussedState {
   state?: TimerState
 }
 
+export type TaskId = string
+
 export interface State {
   ui: UI
   focussedState?: FocussedState
-  tasks: TaskItem[]
+  tasks: Record<TaskId, TaskItem>
+  taskOrder: TaskId[],
   highlightedIndex: number
   editing: boolean
 }
@@ -27,15 +31,17 @@ export const TimerState = constructors<TimerState>()
 
 export type Action = Enum<{
   AddTask: _
-  DeleteTask: number
-  ToggleCheck: number
+  DeleteTask: TaskId
+  ToggleCheck: TaskId
   SelectUp: _
   SelectDown: _
+  MoveUp: _
+  MoveDown: _
   SetEditing: boolean
-  SetContents: { index: number; value: string }
+  SetContents: { id: TaskId; value: string }
   GotoFocus: _
   GotoList: _
-  SwitchFocus: number
+  SwitchFocus: TaskId
   Tick: _
   TakeBreak: number // minutes
   EndBreak: _
