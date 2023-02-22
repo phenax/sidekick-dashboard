@@ -12,7 +12,10 @@ interface Props {
 
 export default function FocusMode(props: Props) {
   createKeyboardHandler((ev) => {
-    if (ev.ctrlKey) return
+    if (ev.ctrlKey) return {
+      d: () => props.dispatch(Action.EndFocusMode()),
+    }
+
     return {
       b: () => props.dispatch(Action.TakeBreak(BREAK_DURATION)),
       r: () => props.dispatch(Action.EndBreak()),

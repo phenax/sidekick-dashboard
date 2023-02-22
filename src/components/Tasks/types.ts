@@ -52,6 +52,7 @@ export type Action = Enum<{
   LoadTasksSuccess: TaskItem[]
   LoadTasksFailure: string
   SyncTasks: _
+  EndFocusMode: _
 }>
 export const Action = constructors<Action>()
 

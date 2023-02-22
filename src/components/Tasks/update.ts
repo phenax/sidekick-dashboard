@@ -12,7 +12,7 @@ const uuid = () =>
   `${Math.random()}${Math.random()}`.slice(2, 18).padEnd(16, '0')
 
 const gotoFocus = (s: State) =>
-  s.focussedState ? modifyPath(['ui'] as const, always(UI.Focus()), s) : s
+  s.focussedState ? modify('ui', always(UI.Focus()), s) : s
 
 const nextTimerState = (state: State) => {
   const updateTS = (fn: (_: TimerState) => TimerState): State =>
@@ -151,14 +151,9 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
       match<State, UI>({
         List: (_) =>
           compose(
-            (s: State) => modifyPath(['editing'] as const, always(true), s),
-            (s: State) =>
-              modifyPath(
-                ['highlightedIndex'] as const,
-                always(s.taskOrder.length - 1),
-                s
-              ),
-            (s: State) => {
+            modify('editing', always(true)),
+            (s: State) => modify('highlightedIndex', always(s.taskOrder.length - 1), s),
+            (s) => {
               const tid = uuid()
               return compose(
                 modify('tasks', (t: Record<TaskId, TaskItem>) => ({
@@ -167,7 +162,7 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
                 })),
                 modify('taskOrder', (t: TaskId[]) => [...t, tid])
               )(s) as State
-            }
+            },
           )(state),
         _: () => state,
       })(state.ui)
@@ -178,9 +173,7 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
       compose(
         modify('highlightedIndex', clamp(0, state.taskOrder.length - 2)),
         modify('tasks', dissoc(taskId) as any) as (s: State) => State,
-        modify('taskOrder', filter((t) => t !== taskId) as any) as (
-          s: State
-        ) => State
+        modify('taskOrder', filter((t) => t !== taskId) as any) as (s: State) => State
       )(state)
     ),
 
@@ -192,7 +185,7 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
         ),
 
   SetEditing: (enable) => (state) =>
-    Effect.Pure(modifyPath(['editing'] as const, always(enable), state)),
+    Effect.Pure(modify('editing', always(enable), state)),
 
   SetContents:
     ({ id, value }) =>
@@ -201,7 +194,7 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
         compose(
           (s: State) =>
             modifyPath(['tasks', id, 'text'] as const, always(value), s),
-          (s: State) => modifyPath(['editing'] as const, always(false), s)
+          modify('editing', always(false)) as (s: State) => State,
         )(state)
       ),
 
@@ -222,6 +215,13 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
     ),
 
   EndBreak: () => (state: State) => Effect.Pure(startFocus(state)),
+
+  EndFocusMode: () => (state: State) => Effect.Pure(
+    compose(
+      modify('focussedState', always(undefined)),
+      modify('ui', always(UI.List())),
+    )(state)
+  ),
 
   Refresh: () => (state) =>
     Effect.Effectful({
