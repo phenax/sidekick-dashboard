@@ -139,6 +139,9 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
     Effect.Pure({ ...state, highlightedIndex: prevIndex(state) }),
   SelectDown: () => (state) =>
     Effect.Pure({ ...state, highlightedIndex: nextIndex(state) }),
+  SelectFirst: () => (state) => Effect.Pure({ ...state, highlightedIndex: 0 }),
+  SelectLast: () => (state) =>
+    Effect.Pure({ ...state, highlightedIndex: state.taskOrder.length - 1 }),
 
   MoveUp: () => (state) => Effect.Pure(swapTasks(prevIndex(state), state)),
   MoveDown: () => (state) => Effect.Pure(swapTasks(nextIndex(state), state)),

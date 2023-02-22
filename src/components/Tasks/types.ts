@@ -35,6 +35,8 @@ export type Action = Enum<{
   ToggleCheck: TaskId
   SelectUp: _
   SelectDown: _
+  SelectFirst: _
+  SelectLast: _
   MoveUp: _
   MoveDown: _
   SetEditing: boolean

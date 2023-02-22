@@ -25,6 +25,8 @@ export default function TaskList(props: Props) {
       e: () => props.dispatch(Action.SetEditing(true)),
       l: () => props.dispatch(Action.GotoFocus()),
 
+      g: () => props.dispatch(Action.SelectFirst()),
+      G: () => props.dispatch(Action.SelectLast()),
       j: () => props.dispatch(Action.SelectDown()),
       k: () => props.dispatch(Action.SelectUp()),
 
