@@ -42,21 +42,32 @@ export const createReducer = <State extends object, Action>(
   return [state, dispatch]
 }
 
-export const createKeyboardHandler = (
-  pat: (
-    ev: KeyboardEvent
-  ) => Record<string, (() => void) | undefined | null> | undefined | null
-) => {
-  const onKeyPress = (ev: KeyboardEvent) => {
-    const p = pat(ev)
-    p &&
-      match({ _: () => {}, ...(p as any) })({ tag: ev.key, value: undefined })
-  }
-  onMount(() => window.addEventListener('keypress', onKeyPress))
-  onCleanup(() => window.removeEventListener('keypress', onKeyPress))
-}
-
 export const createTimer = (interval: number, action: () => void) => {
   const timer = setInterval(action, interval)
   onCleanup(() => clearInterval(timer))
 }
+
+type KeyMapFn = (ev: KeyboardEvent) => Record<string, (() => void) | undefined | null> | undefined | null
+
+const keyboardHandler = (() => {
+  const eventMapping: Set<KeyMapFn> = new Set()
+
+  const onKeyPress = (ev: KeyboardEvent) => {
+    eventMapping.forEach(pat => {
+      const p = pat(ev)
+      p &&
+        match({ _: () => {}, ...(p as any) })({ tag: ev.key, value: undefined })
+    })
+  }
+  window.addEventListener('keypress', onKeyPress)
+
+  const register = (pat: KeyMapFn) => eventMapping.add(pat)
+  const unregister = (pat: KeyMapFn) => eventMapping.delete(pat)
+  return { register, unregister }
+})()
+
+export const createKeyboardHandler = (pat: KeyMapFn) => {
+  onMount(() => keyboardHandler.register(pat))
+  onCleanup(() => keyboardHandler.unregister(pat))
+}
+

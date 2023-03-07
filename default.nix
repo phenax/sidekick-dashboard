@@ -37,6 +37,7 @@ let
 
   devShell = with pkgs; mkShell rec {
     buildInputs = libDeps ++ [
+      rust
       nodePackages.pnpm
       nodePackages.nodemon
       nodePackages.typescript
