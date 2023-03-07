@@ -65,11 +65,13 @@ rustPlatform.buildRustPackage rec {
     let
       nodeModulesPath = "${nodePkgs.nodeDependencies}/lib/node_modules";
       npm = "${nodejs}/bin/npm";
-      withSetup = s: "cd ..; chmod 644 -R ./;" ++ s ++ "cd src-tauri;";
     in
     withSetup ''
+      cd ..;
+      chmod 755 -R .;
       ln -s "${nodeModulesPath}" node_modules;
       ${npm} --offline run build;
+      cd src-tauri;
     '';
 
   passthru = {
