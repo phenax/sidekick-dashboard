@@ -67,7 +67,7 @@ rustPlatform.buildRustPackage rec {
       nodeModulesPath = "${nodePkgs.nodeDependencies}/lib/node_modules";
       npm = "${nodejs}/bin/npm";
     in
-    withSetup ''
+    ''
       cd ..;
       chmod 755 -R .;
       ln -s "${nodeModulesPath}" node_modules;
