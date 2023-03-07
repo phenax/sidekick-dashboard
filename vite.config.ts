@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 
 export default defineConfig({
@@ -25,8 +25,8 @@ export default defineConfig({
     sourcemap: !!process.env.TAURI_DEBUG,
   },
 
-  test: {
-    globals: true,
-    environment: 'jsdom',
-  },
+  // test: {
+  //   globals: true,
+  //   environment: 'jsdom',
+  // },
 })

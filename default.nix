@@ -17,7 +17,8 @@ let
   nodePkgs = import ./nix/default.nix { inherit nodejs; };
 
   libDeps = with pkgs; [
-    rust
+    # rust
+    nodejs
     pkg-config
     libclang
     libGL
@@ -32,7 +33,6 @@ let
     openssl_3
     glib
     appimagekit
-    nodejs
   ];
 
   devShell = with pkgs; mkShell rec {
@@ -42,6 +42,7 @@ let
       nodePackages.typescript
       nodePackages.typescript-language-server
       rust-analyzer
+      node2nix
     ];
     nativeBuildInputs = [ clang ];
 
@@ -52,20 +53,24 @@ rustPlatform.buildRustPackage rec {
   pname = "sidekick-dashboard";
   version = "0.0.0";
 
-  src = ./src-tauri;
+  srcs = ./.;
+  sourceRoot = "sidekick-dashboard/src-tauri";
 
   cargoSha256 = "sha256-La+5eHdud1zSgXGugHHPKVH1GXdeeeOhzXuzVOHxK+w=";
 
   nativeBuildInputs = with pkgs; [ cmake clang pkg-config ];
   buildInputs = libDeps ++ [ nodePkgs.nodeDependencies ];
 
-  shellHook = ''
-    export NODE_PATH=${nodePkgs.nodeDependencies}/lib/node_modules;
-  '';
-
-  preBuildHook = ''
-    echo "foobarity ----------------------"
-  '';
+  preBuild =
+    let
+      nodeModulesPath = "${nodePkgs.nodeDependencies}/lib/node_modules";
+      npm = "${nodejs}/bin/npm";
+      withSetup = s: "cd ..; chmod 644 -R ./;" ++ s ++ "cd src-tauri;";
+    in
+    withSetup ''
+      ln -s "${nodeModulesPath}" node_modules;
+      ${npm} --offline run build;
+    '';
 
   passthru = {
     rust = rust;
