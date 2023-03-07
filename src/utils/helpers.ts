@@ -25,3 +25,7 @@ export const modifyPath = <
   const v = path(p, o) as Val
   return assocPath(p, fn(v), o)
 }
+
+export const uuid = () =>
+  `${Math.random()}${Math.random()}`.slice(2, 18).padEnd(16, '0')
+

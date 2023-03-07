@@ -13,15 +13,17 @@ interface Props {
 export default function TaskList(props: Props) {
   createKeyboardHandler((ev) => {
     if (props.isEditing) return
-    if (ev.ctrlKey) return
 
     const currentId = props.tasks[props.highlightedIndex].id
 
     ev.preventDefault()
+    if (ev.ctrlKey) return {
+      d: () => props.dispatch(Action.DeleteTask(currentId)),
+    }
+
     return {
       a: () => props.dispatch(Action.AddTask()),
       r: () => props.dispatch(Action.LoadTasks()),
-      d: () => props.dispatch(Action.DeleteTask(currentId)),
       e: () => props.dispatch(Action.SetEditing(true)),
       l: () => props.dispatch(Action.GotoFocus()),
 

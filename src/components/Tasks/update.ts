@@ -1,15 +1,12 @@
 import { invoke } from '@tauri-apps/api'
-import { not, always, compose, modify, clamp, dissoc, filter } from 'ramda'
+import { not, always, compose, modify, clamp, dissoc, filter, insert } from 'ramda'
 import { match } from '../../utils/adt'
-import { modifyPath } from '../../utils/helpers'
+import { modifyPath, uuid } from '../../utils/helpers'
 import { Effect } from '../../utils/solid'
 import { Action, State, TaskId, TaskItem, TimerState, UI } from './types'
 
 export const FOCUS_DURATION = 30
 export const BREAK_DURATION = 10
-
-const uuid = () =>
-  `${Math.random()}${Math.random()}`.slice(2, 18).padEnd(16, '0')
 
 const gotoFocus = (s: State) =>
   s.focussedState ? modify('ui', always(UI.Focus()), s) : s
@@ -152,15 +149,15 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
         List: (_) =>
           compose(
             modify('editing', always(true)),
-            (s: State) => modify('highlightedIndex', always(s.taskOrder.length - 1), s),
-            (s) => {
+            (s: State) => modify('highlightedIndex', always(s.highlightedIndex + 1), s),
+            (s: State) => {
               const tid = uuid()
               return compose(
                 modify('tasks', (t: Record<TaskId, TaskItem>) => ({
                   ...t,
                   [tid]: { id: tid, text: '' },
                 })),
-                modify('taskOrder', (t: TaskId[]) => [...t, tid])
+                modify('taskOrder', insert(s.highlightedIndex + 1, tid))
               )(s) as State
             },
           )(state),
