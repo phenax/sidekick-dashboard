@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { }, sourceRoot ? "sidekick-dashboard/src-tauri" }:
+{ pkgs ? import <nixpkgs> { }, sourceRoot ? "sidekick-dashboard" }:
 with pkgs;
 
 let
@@ -49,23 +49,20 @@ let
 
     LD_LIBRARY_PATH = lib.makeLibraryPath (buildInputs ++ nativeBuildInputs);
   };
+
+  rustRoot = "${sourceRoot}/src-tauri";
 in
 rustPlatform.buildRustPackage rec {
   pname = "sidekick-dashboard";
   version = "0.0.0";
 
   srcs = ./.;
-  inherit sourceRoot;
+  sourceRoot = rustRoot;
 
   cargoSha256 = "sha256-La+5eHdud1zSgXGugHHPKVH1GXdeeeOhzXuzVOHxK+w=";
 
   nativeBuildInputs = with pkgs; [ cmake clang pkg-config ];
   buildInputs = libDeps ++ [ nodePkgs.nodeDependencies ];
-
-  preUnpack = '' echo "-----------------"; pwd; ls; echo "-----------------"; '';
-  postUnpack = '' echo "-----------------"; pwd; ls; echo "-----------------"; '';
-  preConfigure = '' echo "-----------------"; pwd; ls; echo "-----------------"; '';
-  postConfigure = '' echo "-----------------"; pwd; ls; echo "-----------------"; '';
 
   preBuild =
     let
