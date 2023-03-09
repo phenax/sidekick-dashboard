@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { } }:
+{ pkgs ? import <nixpkgs> { }, sourceRoot ? "sidekick-dashboard/src-tauri" }:
 with pkgs;
 
 let
@@ -55,12 +55,17 @@ rustPlatform.buildRustPackage rec {
   version = "0.0.0";
 
   srcs = ./.;
-  sourceRoot = "sidekick-dashboard/src-tauri";
+  inherit sourceRoot;
 
   cargoSha256 = "sha256-La+5eHdud1zSgXGugHHPKVH1GXdeeeOhzXuzVOHxK+w=";
 
   nativeBuildInputs = with pkgs; [ cmake clang pkg-config ];
   buildInputs = libDeps ++ [ nodePkgs.nodeDependencies ];
+
+  preUnpack = '' echo "-----------------"; pwd; ls; echo "-----------------"; '';
+  postUnpack = '' echo "-----------------"; pwd; ls; echo "-----------------"; '';
+  preConfigure = '' echo "-----------------"; pwd; ls; echo "-----------------"; '';
+  postConfigure = '' echo "-----------------"; pwd; ls; echo "-----------------"; '';
 
   preBuild =
     let
