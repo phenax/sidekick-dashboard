@@ -5,8 +5,8 @@ let
   src = pkgs.fetchFromGitHub {
     owner = "mozilla";
     repo = "nixpkgs-mozilla";
-    rev = "15b7a05f20aab51c4ffbefddb1b448e862dccb7d"; # 10th April 2022
-    sha256 = "sha256-YeN4bpPvHkVOpQzb8APTAfE7/R+MFMwJUMkqmfvytSk=";
+    rev = "78e7239"; # 13th March 2023
+    sha256 = "sha256-A1gO8zlWLv3+tZ3cGVB1WYvvoN9pbFyv0xIJHcTsckw=";
   };
   moz = import "${src.out}/rust-overlay.nix" pkgs pkgs;
   rust = moz.latest.rustChannels.nightly.rust.override {
