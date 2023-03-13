@@ -1,5 +1,5 @@
 import { compose } from 'ramda'
-import { onCleanup, onMount } from 'solid-js'
+import { createSignal, onCleanup, onMount } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { constructors, Enum, match, _ } from './adt'
 
@@ -61,8 +61,8 @@ const keyboardHandler = (() => {
   }
   window.addEventListener('keypress', onKeyPress)
 
-  const register = (pat: KeyMapFn) => eventMapping.add(pat)
-  const unregister = (pat: KeyMapFn) => eventMapping.delete(pat)
+  const register = (pat: KeyMapFn) => pat && eventMapping.add(pat)
+  const unregister = (pat: KeyMapFn) => pat && eventMapping.delete(pat)
   return { register, unregister }
 })()
 

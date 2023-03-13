@@ -1,12 +1,27 @@
 import { invoke } from '@tauri-apps/api'
-import { not, always, compose, modify, clamp, dissoc, filter, insert } from 'ramda'
+import {
+  not,
+  always,
+  compose,
+  modify,
+  clamp,
+  dissoc,
+  filter,
+  insert,
+} from 'ramda'
 import { match } from '../../utils/adt'
 import { modifyPath, uuid } from '../../utils/helpers'
 import { Effect } from '../../utils/solid'
-import { Action, State, TaskId, TaskItem, TimerState, UI } from './types'
+import { Action, State, TimerState, UI } from './types'
 
 export const FOCUS_DURATION = 30
 export const BREAK_DURATION = 10
+
+const onUi = (
+  t: UI['tag'],
+  state: State,
+  fn: (s: State) => Effect<State, Action>
+) => (t === state.ui.tag ? fn(state) : Effect.Pure(state))
 
 const gotoFocus = (s: State) =>
   s.focussedState ? modify('ui', always(UI.Focus()), s) : s
@@ -144,34 +159,30 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
   MoveDown: () => (state) => Effect.Pure(swapTasks(nextIndex(state), state)),
 
   AddTask: () => (state) =>
-    Effect.Pure(
-      match<State, UI>({
-        List: (_) =>
-          compose(
-            modify('editing', always(true)),
-            (s: State) => modify('highlightedIndex', always(s.highlightedIndex + 1), s),
-            (s: State) => {
-              const tid = uuid()
-              return compose(
-                modify('tasks', (t: Record<TaskId, TaskItem>) => ({
-                  ...t,
-                  [tid]: { id: tid, text: '' },
-                })),
-                modify('taskOrder', insert(s.highlightedIndex + 1, tid))
-              )(s) as State
-            },
-          )(state),
-        _: () => state,
-      })(state.ui)
-    ),
+    onUi('List', state, (s) => {
+      const tid = uuid()
+      const idx = s.highlightedIndex + 1
+      return Effect.Pure({
+        ...s,
+        editing: false,
+        highlightedIndex: idx,
+        tasks: { ...s.tasks, [tid]: { id: tid, text: '' } },
+        taskOrder: insert(idx, tid, s.taskOrder),
+      })
+    }),
 
   DeleteTask: (taskId) => (state) =>
-    Effect.Pure(
-      compose(
-        modify('highlightedIndex', clamp(0, state.taskOrder.length - 2)),
-        modify('tasks', dissoc(taskId) as any) as (s: State) => State,
-        modify('taskOrder', filter((t) => t !== taskId) as any) as (s: State) => State
-      )(state)
+    onUi('List', state, (s) =>
+      Effect.Pure({
+        ...s,
+        highlightedIndex: clamp(
+          0,
+          state.taskOrder.length - 2,
+          s.highlightedIndex
+        ),
+        tasks: dissoc(taskId, s.tasks),
+        taskOrder: filter((t) => t !== taskId, s.taskOrder),
+      })
     ),
 
   ToggleCheck: (index) => (state) =>
@@ -181,44 +192,32 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
           modifyPath(['tasks', index, 'checked'] as const, not, state)
         ),
 
-  SetEditing: (enable) => (state) =>
-    Effect.Pure(modify('editing', always(enable), state)),
+  SetEditing: (editing) => (state) => Effect.Pure({ ...state, editing }),
 
   SetContents:
     ({ id, value }) =>
     (state) =>
-      Effect.Pure(
-        compose(
-          (s: State) =>
-            modifyPath(['tasks', id, 'text'] as const, always(value), s),
-          modify('editing', always(false)) as (s: State) => State,
-        )(state)
-      ),
+      Effect.Pure({
+        ...modifyPath(['tasks', id, 'text'] as const, always(value), state),
+        editing: false,
+      }),
 
   Tick: () => (state) =>
-    Effect.Pure(
-      match<State, UI>({
-        Focus: () => nextTimerState(state),
-        _: () => state,
-      })(state.ui)
-    ),
+    onUi('Focus', state, (s) => Effect.Pure(nextTimerState(s))),
 
   TakeBreak: (minutes) => (state) =>
-    Effect.Pure(
-      match<State, UI>({
-        Focus: () => startBreak(state, minutes),
-        _: () => state,
-      })(state.ui)
-    ),
+    onUi('Focus', state, (s) => Effect.Pure(startBreak(s, minutes))),
 
   EndBreak: () => (state: State) => Effect.Pure(startFocus(state)),
 
-  EndFocusMode: () => (state: State) => Effect.Pure(
-    compose(
-      modify('focussedState', always(undefined)),
-      modify('ui', always(UI.List())),
-    )(state)
-  ),
+  EndFocusMode: () => (state: State) =>
+    onUi('Focus', state, (s) =>
+      Effect.Pure({
+        ...s,
+        focussedState: undefined,
+        ui: UI.List(),
+      })
+    ),
 
   Refresh: () => (state) =>
     Effect.Effectful({

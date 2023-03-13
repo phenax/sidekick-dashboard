@@ -39,7 +39,7 @@ export default function TaskList(props: Props) {
   })
 
   return (
-    <div class="text-2xl mx-4">
+    <div class="text-2xl mx-4 py-2">
       <For
         each={props.tasks}
         fallback={() => (
