@@ -135,14 +135,14 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
     state.editing ? Effect.Noop() : Effect.Pure({ ...state, ui: UI.List() }),
   GotoFocus: () => (state: State) =>
     state.editing ? Effect.Noop() : Effect.Pure(gotoFocus(state)),
-  SwitchFocus: (index) => (state: State) =>
+  SwitchFocus: (id) => (state: State) =>
     state.editing
       ? Effect.Noop()
       : Effect.Pure(
           compose(
             gotoFocus,
             (s: State) =>
-              modifyPath(['focussedState', 'index'] as const, always(index), s),
+              modifyPath(['focussedState', 'id'] as const, always(id), s),
             startFocus
           )(state)
         ),

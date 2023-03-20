@@ -7,7 +7,7 @@ export interface TaskItem {
 }
 
 export interface FocussedState {
-  index: number
+  id: TaskId
   state?: TimerState
 }
 

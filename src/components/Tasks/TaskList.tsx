@@ -50,6 +50,7 @@ export default function TaskList(props: Props) {
             task={task}
             isHighlighted={props.highlightedIndex === index()}
             isEditing={props.highlightedIndex === index() && props.isEditing}
+            isFocused={false}
             submit={(value) => {
               props.dispatch(
                 Action.SetContents({

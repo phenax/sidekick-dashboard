@@ -41,11 +41,15 @@ export default function Tasks() {
             isEditing={state.editing}
           />
         </Match>
-        <Match when={state.ui.tag === 'Focus' && state.focussedState}>
+        <Match when={state.ui.tag === 'Focus' && state.focussedState?.id}>
           <FocusMode
             dispatch={dispatch}
             focussedState={state.focussedState as any}
-            task={state.tasks[state.focussedState?.index ?? 0]}
+            task={
+              state.focussedState?.id
+                ? state.tasks[state.focussedState?.id]
+                : (undefined as never)
+            }
           />
         </Match>
       </Switch>

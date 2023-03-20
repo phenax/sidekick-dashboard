@@ -6,6 +6,7 @@ interface TaskProps {
   task: TaskItem
   isHighlighted: boolean
   isEditing: boolean
+  isFocused: boolean
   toggle: () => void
   submit: (text: string) => void
   cancel: () => void
@@ -63,6 +64,7 @@ export default function Task(props: TaskProps) {
               }`}
             >
               {props.task.text}
+              {props.isFocused ? <span>FOCUS</span> : ''}
             </div>
           }
         >
