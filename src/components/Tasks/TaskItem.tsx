@@ -63,8 +63,10 @@ export default function Task(props: TaskProps) {
                 props.task.checked ? 'line-through text-slate-600' : ''
               }`}
             >
+              {props.isFocused && (
+                <span class="inline-block pr-3 text-sm align-middle">🔍</span>
+              )}
               {props.task.text}
-              {props.isFocused ? <span>FOCUS</span> : ''}
             </div>
           }
         >

@@ -1,12 +1,13 @@
 import { For } from 'solid-js'
 import { createKeyboardHandler, Dispatch } from '../../utils/solid'
 import Task from './TaskItem'
-import { Action, TaskItem } from './types'
+import { Action, FocussedState, TaskItem } from './types'
 
 interface Props {
   tasks: TaskItem[]
   highlightedIndex: number
   isEditing: boolean
+  focussedState?: FocussedState
   dispatch: Dispatch<Action>
 }
 
@@ -20,6 +21,7 @@ export default function TaskList(props: Props) {
     return {
       a: () => props.dispatch(Action.AddTask()),
       'C-d': () => props.dispatch(Action.DeleteTask(currentId)),
+      'C-k': () => props.dispatch(Action.EndFocusMode()),
       r: () => props.dispatch(Action.LoadTasks()),
       e: () => props.dispatch(Action.SetEditing(true)),
       l: () => props.dispatch(Action.GotoFocus()),
@@ -50,7 +52,7 @@ export default function TaskList(props: Props) {
             task={task}
             isHighlighted={props.highlightedIndex === index()}
             isEditing={props.highlightedIndex === index() && props.isEditing}
-            isFocused={false}
+            isFocused={props.focussedState?.id === task.id}
             submit={(value) => {
               props.dispatch(
                 Action.SetContents({

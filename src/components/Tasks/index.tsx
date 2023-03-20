@@ -39,6 +39,7 @@ export default function Tasks() {
             highlightedIndex={state.highlightedIndex}
             tasks={state.taskOrder.map((tid) => state.tasks[tid])}
             isEditing={state.editing}
+            focussedState={state.focussedState}
           />
         </Match>
         <Match when={state.ui.tag === 'Focus' && state.focussedState?.id}>
