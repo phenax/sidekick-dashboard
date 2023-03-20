@@ -17,7 +17,7 @@ export interface State {
   ui: UI
   focussedState?: FocussedState
   tasks: Record<TaskId, TaskItem>
-  taskOrder: TaskId[],
+  taskOrder: TaskId[]
   highlightedIndex: number
   editing: boolean
 }

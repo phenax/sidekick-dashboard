@@ -28,4 +28,3 @@ export const modifyPath = <
 
 export const uuid = () =>
   `${Math.random()}${Math.random()}`.slice(2, 18).padEnd(16, '0')
-

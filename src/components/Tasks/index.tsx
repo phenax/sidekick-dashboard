@@ -37,7 +37,7 @@ export default function Tasks() {
           <TaskList
             dispatch={dispatch}
             highlightedIndex={state.highlightedIndex}
-            tasks={state.taskOrder.map(tid => state.tasks[tid])}
+            tasks={state.taskOrder.map((tid) => state.tasks[tid])}
             isEditing={state.editing}
           />
         </Match>

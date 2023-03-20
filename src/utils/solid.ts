@@ -33,7 +33,9 @@ export const createReducer = <State extends object, Action>(
     const computeNextState: (s: State) => void = compose(
       setState as any,
       reconcile,
-      runEffect<State, Action>(state, (eff) => eff().then(e => e && dispatch(e))),
+      runEffect<State, Action>(state, (eff) =>
+        eff().then((e) => e && dispatch(e))
+      ),
       reducer(action)
     )
 
@@ -47,17 +49,18 @@ export const createTimer = (interval: number, action: () => void) => {
   onCleanup(() => clearInterval(timer))
 }
 
-type KeyMapFn = (ev: KeyboardEvent) => Record<string, (() => void) | undefined | null> | undefined | null
+type KeyMapFn = (
+  ev: KeyboardEvent
+) => Record<string, (() => void) | undefined | null> | undefined | null
 
 const keyboardHandler = (() => {
   const eventMapping: Set<KeyMapFn> = new Set()
 
   const onKeyPress = (ev: KeyboardEvent) => {
-    eventMapping.forEach(pat => {
+    eventMapping.forEach((pat) => {
       const p = pat(ev)
       const key = `${ev.ctrlKey ? 'C-' : ''}${ev.key}`
-      p &&
-        match({ _: () => {}, ...(p as any) })({ tag: key, value: undefined })
+      p && match({ _: () => {}, ...(p as any) })({ tag: key, value: undefined })
     })
   }
   window.addEventListener('keypress', onKeyPress)
@@ -71,4 +74,3 @@ export const createKeyboardHandler = (pat: KeyMapFn) => {
   onMount(() => keyboardHandler.register(pat))
   onCleanup(() => keyboardHandler.unregister(pat))
 }
-

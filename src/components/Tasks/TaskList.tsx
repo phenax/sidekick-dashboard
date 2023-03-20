@@ -52,12 +52,19 @@ export default function TaskList(props: Props) {
             isEditing={props.highlightedIndex === index() && props.isEditing}
             submit={(value) => {
               props.dispatch(
-                Action.SetContents({ id: props.tasks[props.highlightedIndex].id, value })
+                Action.SetContents({
+                  id: props.tasks[props.highlightedIndex].id,
+                  value,
+                })
               )
             }}
-            toggle={() => props.dispatch(Action.ToggleCheck(props.tasks[index()].id))}
+            toggle={() =>
+              props.dispatch(Action.ToggleCheck(props.tasks[index()].id))
+            }
             cancel={() => props.dispatch(Action.SetEditing(false))}
-            openInFocusMode={() => props.dispatch(Action.SwitchFocus(props.tasks[index()].id))}
+            openInFocusMode={() =>
+              props.dispatch(Action.SwitchFocus(props.tasks[index()].id))
+            }
           />
         )}
       </For>

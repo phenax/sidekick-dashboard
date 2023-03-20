@@ -45,33 +45,40 @@ describe('update', () => {
       ...state,
       highlightedIndex: 2,
       editing: true,
-      tasks: {...state.tasks, 'r@nd0m': { id: 'r@nd0m', text: '' }},
-      taskOrder: [ '1', '2', 'r@nd0m', '3' ],
+      tasks: { ...state.tasks, 'r@nd0m': { id: 'r@nd0m', text: '' } },
+      taskOrder: ['1', '2', 'r@nd0m', '3'],
     })
-    expect(
-      nextState(Action.SetContents({ id: '2', value: 'Foobar' }))
-    ).toEqual({
-      ...state,
-      tasks: {...state.tasks, '2': { id: '2', text: 'Foobar' }},
-    })
+    expect(nextState(Action.SetContents({ id: '2', value: 'Foobar' }))).toEqual(
+      {
+        ...state,
+        tasks: { ...state.tasks, '2': { id: '2', text: 'Foobar' } },
+      }
+    )
     expect(nextState(Action.ToggleCheck('1'))).toEqual({
       ...state,
-      tasks: { ...state.tasks, '1': { id: '1', text: 'Buy milk', checked: true }},
+      tasks: {
+        ...state.tasks,
+        '1': { id: '1', text: 'Buy milk', checked: true },
+      },
     })
     expect(
       chainActions([Action.ToggleCheck('2'), Action.ToggleCheck('2')])
     ).toEqual({
       ...state,
-      tasks: { ...state.tasks, '2': { id: '2', text: 'Pour milk on self', checked: false }},
+      tasks: {
+        ...state.tasks,
+        '2': { id: '2', text: 'Pour milk on self', checked: false },
+      },
     })
 
-
-    expect(nextState(Action.AddTask(), { ...state, tasks: {}, taskOrder: [] })).toEqual({
+    expect(
+      nextState(Action.AddTask(), { ...state, tasks: {}, taskOrder: [] })
+    ).toEqual({
       ...state,
       highlightedIndex: 2,
       editing: true,
-      tasks: {'r@nd0m': { id: 'r@nd0m', text: '' }},
-      taskOrder: [ 'r@nd0m' ],
+      tasks: { 'r@nd0m': { id: 'r@nd0m', text: '' } },
+      taskOrder: ['r@nd0m'],
     })
   })
 })

@@ -55,7 +55,17 @@ export default function Task(props: TaskProps) {
         }`}
       ></div>
       <div class="w-full">
-        <Switch fallback={<div class="mt-1">{props.task.text}</div>}>
+        <Switch
+          fallback={
+            <div
+              class={`mt-1 ${
+                props.task.checked ? 'line-through text-slate-600' : ''
+              }`}
+            >
+              {props.task.text}
+            </div>
+          }
+        >
           <Match when={props.isEditing}>
             <input
               type="text"
