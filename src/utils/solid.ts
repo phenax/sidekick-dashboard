@@ -55,8 +55,9 @@ const keyboardHandler = (() => {
   const onKeyPress = (ev: KeyboardEvent) => {
     eventMapping.forEach(pat => {
       const p = pat(ev)
+      const key = `${ev.ctrlKey ? 'C-' : ''}${ev.key}`
       p &&
-        match({ _: () => {}, ...(p as any) })({ tag: ev.key, value: undefined })
+        match({ _: () => {}, ...(p as any) })({ tag: key, value: undefined })
     })
   }
   window.addEventListener('keypress', onKeyPress)

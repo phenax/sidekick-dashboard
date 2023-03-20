@@ -16,11 +16,9 @@ const init: State = {
 export default function Tasks() {
   const [state, dispatch] = createReducer(init, update)
 
-  createKeyboardHandler((ev) => {
-    if (ev.ctrlKey) {
-      return {
-        r: () => dispatch(Action.Refresh()),
-      }
+  createKeyboardHandler((_) => {
+    return {
+      'C-r': () => dispatch(Action.Refresh()),
     }
   })
 

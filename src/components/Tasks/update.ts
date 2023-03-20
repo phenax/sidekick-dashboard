@@ -164,7 +164,7 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
       const idx = s.highlightedIndex + 1
       return Effect.Pure({
         ...s,
-        editing: false,
+        editing: true,
         highlightedIndex: idx,
         tasks: { ...s.tasks, [tid]: { id: tid, text: '' } },
         taskOrder: insert(idx, tid, s.taskOrder),

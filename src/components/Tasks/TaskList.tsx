@@ -17,12 +17,9 @@ export default function TaskList(props: Props) {
     const currentId = props.tasks[props.highlightedIndex].id
 
     ev.preventDefault()
-    if (ev.ctrlKey) return {
-      d: () => props.dispatch(Action.DeleteTask(currentId)),
-    }
-
     return {
       a: () => props.dispatch(Action.AddTask()),
+      'C-d': () => props.dispatch(Action.DeleteTask(currentId)),
       r: () => props.dispatch(Action.LoadTasks()),
       e: () => props.dispatch(Action.SetEditing(true)),
       l: () => props.dispatch(Action.GotoFocus()),
