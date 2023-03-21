@@ -15,6 +15,7 @@ specifiers:
   ramda: ^0.28.0
   solid-js: ^1.4.7
   tailwindcss: ^3.2.4
+  typed-regex: ^0.0.8
   typescript: ^4.7.4
   vite: ^4.0.0
   vite-plugin-solid: ^2.3.0
@@ -30,6 +31,7 @@ dependencies:
   ramda: 0.28.0
   solid-js: 1.6.9
   tailwindcss: 3.2.4_postcss@8.4.21
+  typed-regex: 0.0.8
   typescript: 4.9.4
   vite: 4.0.4_@types+node@18.11.18
   vite-plugin-solid: 2.5.0_solid-js@1.6.9+vite@4.0.4
@@ -2524,6 +2526,10 @@ packages:
     resolution: {integrity: sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==}
     engines: {node: '>=4'}
     dev: true
+
+  /typed-regex/0.0.8:
+    resolution: {integrity: sha512-1XkGm1T/rUngbFROIOw9wPnMAKeMsRoc+c9O6GwOHz6aH/FrJFtcyd2sHASbT0OXeGLot5N1shPNpwHGTv9RdQ==}
+    dev: false
 
   /typescript/4.9.4:
     resolution: {integrity: sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==}

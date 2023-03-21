@@ -1,4 +1,12 @@
-import { createSignal, Switch, Match, createEffect } from 'solid-js'
+import {
+  createSignal,
+  Switch,
+  Match,
+  createEffect,
+  For,
+  createMemo,
+} from 'solid-js'
+import { TypedRegEx } from 'typed-regex'
 import { createKeyboardHandler } from '../../utils/solid'
 import { TaskItem } from './types'
 
@@ -43,9 +51,24 @@ export default function Task(props: TaskProps) {
     }
   })
 
+  const getDeadline = createMemo(
+    () =>
+      TypedRegEx('@\\((?<deadline>[a-z0-9-_ ]+)\\)', 'gi').captures(
+        props.task.text
+      )?.deadline
+  )
+  const getLabels = createMemo(() =>
+    TypedRegEx(':(?<labels>[a-z0-9-_ ]+):', 'gi')
+      .captureAll(props.task.text)
+      .map((p) => p?.labels)
+  )
+  const getDisplayText = createMemo(() =>
+    props.task.text.replaceAll(/:[a-z0-9-_ ]+:|@\([a-z0-9-_ ]+\)/gi, '')
+  )
+
   return (
     <div
-      class={`flex items-center justify-start bg-dark-900 px-4 py-2 mt-2 border-l-4 ${
+      class={`flex items-center justify-start bg-dark-900 px-4 py-2 mt-2 border-l-4 relative ${
         props.isHighlighted ? 'border-purple' : 'border-transparent'
       }`}
       onClick={props.toggle}
@@ -59,14 +82,29 @@ export default function Task(props: TaskProps) {
         <Switch
           fallback={
             <div
-              class={`mt-1 ${
+              class={`flex mt-1 ${
                 props.task.checked ? 'line-through text-slate-600' : ''
               }`}
             >
               {props.isFocused && (
                 <span class="inline-block pr-3 text-sm align-middle">🔍</span>
               )}
-              {props.task.text}
+              <div class="flex items-center text-sm">
+                <For each={getLabels()}>
+                  {(label) => (
+                    <div class="px-1 mr-1 bg-slate-800 text-slate-300 font-primarybold">
+                      {label}
+                    </div>
+                  )}
+                </For>
+              </div>
+              <span class="inline-block pl-1"></span>
+              {getDisplayText()}
+              {getDeadline() && (
+                <div class="absolute right-0 top-0 px-1 text-sm bg-red-800">
+                  {getDeadline()}
+                </div>
+              )}
             </div>
           }
         >
