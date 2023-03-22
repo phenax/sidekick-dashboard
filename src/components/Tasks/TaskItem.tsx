@@ -80,6 +80,8 @@ export default function Task(props: TaskProps) {
     try {
       const date = parse(deadline, 'd MMMM', new Date())
 
+      if (props.task.checked)
+        return { text: deadline, style: 'border border-slate-800 line-through' }
       if (isToday(date))
         return { text: 'Today', style: 'bg-red-700 text-white' }
       if (isTomorrow(date))
