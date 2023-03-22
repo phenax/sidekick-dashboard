@@ -1,3 +1,4 @@
+import { isBefore, isSameDay, isToday, isTomorrow, parse } from 'date-fns'
 import {
   createSignal,
   Switch,
@@ -9,6 +10,10 @@ import {
 import { TypedRegEx } from 'typed-regex'
 import { createKeyboardHandler } from '../../utils/solid'
 import { TaskItem } from './types'
+
+Object.assign(window as any, {
+  parseDate: parse,
+})
 
 interface TaskProps {
   task: TaskItem
@@ -57,14 +62,31 @@ export default function Task(props: TaskProps) {
         props.task.text
       )?.deadline
   )
+
   const getLabels = createMemo(() =>
     TypedRegEx(':(?<labels>[a-z0-9-_ ]+):', 'gi')
       .captureAll(props.task.text)
       .map((p) => p?.labels)
   )
+
   const getDisplayText = createMemo(() =>
     props.task.text.replaceAll(/:[a-z0-9-_ ]+:|@\([a-z0-9-_ ]+\)/gi, '')
   )
+
+  const getDeadlineInfo = createMemo(() => {
+    const deadline = getDeadline()
+    if (!deadline) return { text: '', style: '' }
+
+    try {
+      const date = parse(deadline, 'd MMMM', new Date())
+
+      if (isToday(date)) return { text: 'Today', style: 'bg-red-700 text-white' }
+      if (isTomorrow(date)) return { text: 'Tomorrow', style: 'bg-yellow-800 text-white'}
+      if (isBefore(date, new Date())) return { text: `Overdue: ${deadline}`, style: 'border border-red-600 text-red-600' }
+    } catch (e) {}
+
+    return { text: deadline, style: 'border border-slate-800 text-slate-400' }
+  })
 
   return (
     <div
@@ -101,8 +123,8 @@ export default function Task(props: TaskProps) {
               <span class="inline-block pl-1"></span>
               {getDisplayText()}
               {getDeadline() && (
-                <div class="absolute right-0 top-0 px-1 text-sm bg-red-800">
-                  {getDeadline()}
+                <div class={`absolute right-0 top-0 px-1 text-sm ${getDeadlineInfo().style}`}>
+                  {getDeadlineInfo().text}
                 </div>
               )}
             </div>

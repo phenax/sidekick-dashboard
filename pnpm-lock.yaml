@@ -9,6 +9,7 @@ specifiers:
   '@types/node': ^18.7.10
   '@types/ramda': ^0.28.22
   autoprefixer: ^10.4.13
+  date-fns: ^2.29.3
   jsdom: ^21.1.0
   postcss: ^8.4.21
   prettier: ^2.8.3
@@ -27,6 +28,7 @@ dependencies:
   '@types/node': 18.11.18
   '@types/ramda': 0.28.22
   autoprefixer: 10.4.13_postcss@8.4.21
+  date-fns: 2.29.3
   postcss: 8.4.21
   ramda: 0.28.0
   solid-js: 1.6.9
@@ -1212,6 +1214,11 @@ packages:
       whatwg-mimetype: 3.0.0
       whatwg-url: 11.0.0
     dev: true
+
+  /date-fns/2.29.3:
+    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
+    engines: {node: '>=0.11'}
+    dev: false
 
   /debug/4.3.4:
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
