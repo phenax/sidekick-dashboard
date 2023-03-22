@@ -1,4 +1,4 @@
-import { isBefore, isSameDay, isToday, isTomorrow, parse } from 'date-fns'
+import { differenceInDays, isBefore, isToday, isTomorrow, parse, startOfToday } from 'date-fns'
 import {
   createSignal,
   Switch,
@@ -78,19 +78,27 @@ export default function Task(props: TaskProps) {
     if (!deadline) return { text: '', style: '' }
 
     try {
-      const date = parse(deadline, 'd MMMM', new Date())
+      const deadlineDate = parse(deadline, 'd MMMM', new Date())
+      const today = startOfToday()
 
       if (props.task.checked)
         return { text: deadline, style: 'border border-slate-800 line-through' }
-      if (isToday(date))
+      if (isToday(deadlineDate))
         return { text: 'Today', style: 'bg-red-700 text-white' }
-      if (isTomorrow(date))
+      if (isTomorrow(deadlineDate))
         return { text: 'Tomorrow', style: 'bg-yellow-800 text-white' }
-      if (isBefore(date, new Date()))
+      if (isBefore(deadlineDate, today))
         return {
           text: `Overdue: ${deadline}`,
           style: 'border border-red-600 text-red-600',
         }
+      const diff = differenceInDays(deadlineDate, today)
+      if (diff <= 5) {
+        return {
+          text: `${deadline} (${diff} days left)`,
+          style: 'border border-slate-800 text-yellow-700',
+        }
+      }
     } catch (e) {}
 
     return { text: deadline, style: 'border border-slate-800 text-slate-400' }

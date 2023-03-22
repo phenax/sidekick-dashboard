@@ -5,7 +5,7 @@ import Tasks from './components/Tasks'
 
 function App() {
   return (
-    <div>
+    <div class="flex flex-col justify-start items-stretch">
       <Clock />
       <Tasks />
     </div>
