@@ -176,6 +176,7 @@ export const update = match<(s: State) => Effect<State, Action>, Action>({
           state.taskOrder.length - 2,
           s.highlightedIndex
         ),
+        focussedState: s.focussedState?.id === taskId ? undefined : s.focussedState,
         tasks: dissoc(taskId, s.tasks),
         taskOrder: filter((t) => t !== taskId, s.taskOrder),
       })
