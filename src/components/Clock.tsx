@@ -28,12 +28,12 @@ export default function Clock() {
   return (
     <div
       class="text-center bg-dark-900 font-primarybold"
-      style={{ padding: '4rem 0' }}
+      style={{ padding: '3.3rem 0' }}
     >
       <h1 style={{ 'font-size': '7rem', 'line-height': '1em' }}>
         {formattedTime}
       </h1>
-      <div class="text-3xl">{formattedDate}</div>
+      <div class="text-4xl">{formattedDate}</div>
     </div>
   )
 }
