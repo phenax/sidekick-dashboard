@@ -1,5 +1,5 @@
 import { compose } from 'ramda'
-import { createSignal, onCleanup, onMount } from 'solid-js'
+import { onCleanup, onMount } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { constructors, Enum, match, _ } from './adt'
 

@@ -82,14 +82,10 @@ const startBreak = (state: State, minutes: number) =>
   )
 
 const nextIndex = (state: State) =>
-  state.highlightedIndex >= state.taskOrder.length - 1
-    ? 0
-    : state.highlightedIndex + 1
+  clamp(0, state.taskOrder.length - 1, state.highlightedIndex + 1)
 
 const prevIndex = (state: State) =>
-  state.highlightedIndex <= 0
-    ? state.taskOrder.length - 1
-    : state.highlightedIndex - 1
+  clamp(0, state.taskOrder.length - 1, state.highlightedIndex - 1)
 
 const swapTasks = (targetIndex: number, state: State) => {
   const tasks = [...state.taskOrder]

@@ -1,4 +1,11 @@
-import { differenceInDays, isBefore, isToday, isTomorrow, parse, startOfToday } from 'date-fns'
+import {
+  differenceInDays,
+  isBefore,
+  isToday,
+  isTomorrow,
+  parse,
+  startOfToday,
+} from 'date-fns'
 import {
   createSignal,
   Switch,
@@ -120,12 +127,12 @@ export default function Task(props: TaskProps) {
         <Switch
           fallback={
             <div
-              class={`flex mt-1 ${
+              class={`flex mt-1 items-center ${
                 props.task.checked ? 'line-through text-slate-600' : ''
               }`}
             >
               {props.isFocused && (
-                <span class="inline-block pr-3 text-sm align-middle">🔍</span>
+                <span class="inline-block pr-3 text-sm">🔍</span>
               )}
               <div class="flex items-center text-sm">
                 <For each={getLabels()}>
