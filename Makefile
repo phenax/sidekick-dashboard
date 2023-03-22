@@ -1,6 +1,6 @@
 .PHONY: setup build
 
-setup: clean
+setup:
 	cd nix && node2nix -i ../package.json --nodejs-18
 
 clean:
