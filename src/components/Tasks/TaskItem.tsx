@@ -80,9 +80,15 @@ export default function Task(props: TaskProps) {
     try {
       const date = parse(deadline, 'd MMMM', new Date())
 
-      if (isToday(date)) return { text: 'Today', style: 'bg-red-700 text-white' }
-      if (isTomorrow(date)) return { text: 'Tomorrow', style: 'bg-yellow-800 text-white'}
-      if (isBefore(date, new Date())) return { text: `Overdue: ${deadline}`, style: 'border border-red-600 text-red-600' }
+      if (isToday(date))
+        return { text: 'Today', style: 'bg-red-700 text-white' }
+      if (isTomorrow(date))
+        return { text: 'Tomorrow', style: 'bg-yellow-800 text-white' }
+      if (isBefore(date, new Date()))
+        return {
+          text: `Overdue: ${deadline}`,
+          style: 'border border-red-600 text-red-600',
+        }
     } catch (e) {}
 
     return { text: deadline, style: 'border border-slate-800 text-slate-400' }
@@ -123,7 +129,11 @@ export default function Task(props: TaskProps) {
               <span class="inline-block pl-1"></span>
               {getDisplayText()}
               {getDeadline() && (
-                <div class={`absolute right-0 top-0 px-1 text-sm ${getDeadlineInfo().style}`}>
+                <div
+                  class={`absolute right-0 top-0 px-1 text-sm ${
+                    getDeadlineInfo().style
+                  }`}
+                >
                   {getDeadlineInfo().text}
                 </div>
               )}
