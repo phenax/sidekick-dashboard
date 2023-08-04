@@ -59,7 +59,7 @@ rustPlatform.buildRustPackage rec {
   srcs = ./.;
   sourceRoot = rustRoot;
 
-  cargoSha256 = "sha256-La+5eHdud1zSgXGugHHPKVH1GXdeeeOhzXuzVOHxK+w=";
+  cargoSha256 = "sha256-SIV4fvd6N0enJsxW+vstfWEfUn9wiL+lvXNONVCGAHY=";
 
   nativeBuildInputs = with pkgs; [ cmake clang pkg-config ];
   buildInputs = libDeps ++ [ nodePkgs.nodeDependencies ];
