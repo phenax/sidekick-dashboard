@@ -76,8 +76,14 @@ export default function Task(props: TaskProps) {
       .map((p) => p?.labels)
   )
 
+  const getPriority = createMemo(() =>
+    TypedRegEx('!(?<priority>\\w+)', 'gi')
+      .captures(props.task.text)
+      ?.priority?.toLowerCase()
+  )
+
   const getDisplayText = createMemo(() =>
-    props.task.text.replaceAll(/:[a-z0-9-_ ]+:|@\([a-z0-9-_ ]+\)/gi, '')
+    props.task.text.replaceAll(/:[a-z0-9-_ ]+:|@\([a-z0-9-_ ]+\)|!\w+/gi, '')
   )
 
   const getDeadlineInfo = createMemo(() => {
@@ -111,16 +117,45 @@ export default function Task(props: TaskProps) {
     return { text: deadline, style: 'border border-slate-800 text-slate-400' }
   })
 
+  const getPriorityInfo = createMemo(() => {
+    const priority = getPriority()
+
+    if (priority === 'urgent')
+      return {
+        type: 'urgent',
+        text: 'U',
+        style: 'border-2 border-red-700 text-red-500',
+      }
+    if (priority === 'high')
+      return {
+        type: 'high',
+        text: 'H',
+        style: 'border-2 border-red-700 text-red-500',
+      }
+    if (priority === 'medium')
+      return {
+        type: 'medium',
+        text: 'M',
+        style: 'border-2 border-yellow-800 text-yellow-800',
+      }
+
+    return { type: 'low', text: priority ?? 'L', style: '' }
+  })
+
   return (
     <div
-      class={`flex items-center justify-start bg-dark-900 px-4 py-2 mt-2 border-l-4 relative ${
+      class={`flex items-center justify-start bg-dark-900 px-4 py-2.5 mt-2 border-l-4 relative ${
         props.isHighlighted ? 'border-purple' : 'border-transparent'
       }`}
       onClick={props.toggle}
     >
       <div
         class={`w-7 h-7 mr-4 border ${
-          props.task.checked ? 'bg-purple border-purple' : 'border-gray-900'
+          props.task.checked
+            ? 'bg-purple border-purple'
+            : getPriorityInfo().type === 'urgent'
+            ? 'border-2 border-red-700'
+            : 'border-gray-900'
         }`}
       ></div>
       <div class="w-full">
@@ -143,17 +178,20 @@ export default function Task(props: TaskProps) {
                   )}
                 </For>
               </div>
-              <span class="inline-block pl-1"></span>
-              {getDisplayText()}
-              {getDeadline() && (
-                <div
-                  class={`absolute right-0 top-0 px-1 text-sm ${
-                    getDeadlineInfo().style
-                  }`}
-                >
-                  {getDeadlineInfo().text}
-                </div>
-              )}
+              <span class="inline-block pl-1">{getDisplayText()}</span>
+
+              <div class="absolute right-0 top-0 w-full flex justify-end">
+                {getPriorityInfo().type !== 'low' && (
+                  <div class={`text-sm px-1 ml-0.5 ${getPriorityInfo().style}`}>
+                    {getPriorityInfo().text}
+                  </div>
+                )}
+                {getDeadline() && (
+                  <div class={`text-sm px-1 ml-0.5 ${getDeadlineInfo().style}`}>
+                    {getDeadlineInfo().text}
+                  </div>
+                )}
+              </div>
             </div>
           }
         >
